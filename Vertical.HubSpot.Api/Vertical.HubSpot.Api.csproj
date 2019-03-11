@@ -2,13 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <Version>0.2.0</Version>
+    <Version>0.2.0-preview</Version>
     <Company>vertical GmbH</Company>
-    <Authors>Toni Gottschall, vertical GmbH</Authors>
+    <Authors>Toni Gottschall</Authors>
     <Description>Api Library used to access HubSpot</Description>
-    <AssemblyVersion>0.1.8.0</AssemblyVersion>
-    <FileVersion>0.1.8.0</FileVersion>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>vertical GmbH</Copyright>
+    <PackageTags>hubspot, api, crm, access</PackageTags>
+    <RepositoryUrl>https://github.com/verticalgmbh/hubspot-api</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/verticalgmbh/hubspot-api</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

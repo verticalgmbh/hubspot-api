@@ -138,6 +138,97 @@ namespace Vertical.HubSpot.Api.Companies {
         }
 
         /// <summary>
+        /// lists all companies and returns a page of the result
+        /// </summary>
+        /// <typeparam name="T">type of company model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <param name="properties">properties to include in result</param>
+        /// <returns>one page of company list response</returns>
+        public async Task<PageResponse<T>> ListPage<T>(long? offset=null, params string[] properties)
+            where T:HubSpotCompany
+        {
+            EntityModel model = registry.Get(typeof(T));
+
+            JObject response = await rest.Get("companies/v2/companies/paged", GetListParameters(offset, properties).ToArray());
+
+            return new PageResponse<T> {
+                Offset = response.Value<bool>("has-more") ? response.Value<long?>("offset") : null,
+                Data = response.GetValue("companies").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
+            };
+        }
+
+        /// <summary>
+        /// get recently modified companies
+        /// </summary>
+        /// <typeparam name="T">type of company model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <returns>a page of recently modified companies</returns>
+        public async Task<PageResponse<T>> RecentlyModifiedPage<T>(long? offset = null)
+            where T : HubSpotCompany
+        {
+            EntityModel model = registry.Get(typeof(T));
+
+            JObject response = await rest.Get("companies/v2/companies/recent/modified", GetListParameters(offset).ToArray());
+
+            return new PageResponse<T>
+            {
+                Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
+                Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
+            };
+        }
+
+        /// <summary>
+        /// get recently created companies
+        /// </summary>
+        /// <typeparam name="T">type of company model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <returns>a page of recently created companies</returns>
+        public async Task<PageResponse<T>> RecentlyCreatedPage<T>(long? offset = null)
+            where T : HubSpotCompany
+        {
+            EntityModel model = registry.Get(typeof(T));
+
+            JObject response = await rest.Get("companies/v2/companies/recent/created", GetListParameters(offset).ToArray());
+
+            return new PageResponse<T>
+            {
+                Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
+                Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
+            };
+        }
+
+        /// <summary>
+        /// searches for companies by domain criteria
+        /// </summary>
+        /// <typeparam name="T">type of company model</typeparam>
+        /// <param name="domain">domain to search for</param>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <param name="properties">properties to include in search result</param>
+        /// <returns>a page of recently created companies</returns>
+        public async Task<PageResponse<T>> SearchByDomainPage<T>(string domain, long? offset = null, params string[] properties)
+            where T : HubSpotCompany
+        {
+            EntityModel model = registry.Get(typeof(T));
+
+            JObject request = new JObject {
+                ["requestOptions"] = new JObject {
+                    ["properties"] = new JArray(properties.Cast<object>().ToArray())
+                },
+                ["offset"] = new JObject {
+                    ["isPrimary"] = true,
+                    ["companyId"] = offset ?? 0
+                }
+            };
+            JObject response = await rest.Post($"companies/v2/domains/{domain}/companies", request);
+
+            return new PageResponse<T>
+            {
+                Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
+                Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
+            };
+        }
+
+        /// <summary>
         /// lists all companies
         /// </summary>
         /// <typeparam name="T">type of company to return</typeparam>
@@ -145,19 +236,12 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <returns>list of all companies</returns>
         public async Task<T[]> List<T>(params string[] properties)
             where T : HubSpotCompany {
-            EntityModel model = registry.Get(typeof(T));
             List<T> result=new List<T>();
-            long? offset = null;
+            PageResponse<T> response = null;
             do {
-                JObject response = await rest.Get("companies/v2/companies/paged", GetListParameters(offset, properties).ToArray());
-
-                foreach (JObject companyobject in response.GetValue("companies").OfType<JObject>())
-                    result.Add(ToCompany<T>(companyobject, model));
-
-                if (response.Value<bool>("has-more"))
-                    offset = response.Value<long>("offset");
-                else break;
-            } while (true);
+                response = await ListPage<T>(response?.Offset, properties);
+                result.AddRange(response.Data);
+            } while (response.Offset.HasValue);
 
             return result.ToArray();
         }
@@ -171,6 +255,18 @@ namespace Vertical.HubSpot.Api.Companies {
         public async Task<T> Delete<T>(long id)
             where T : HubSpotCompany {
             JObject response = await rest.Delete($"companies/v2/companies/{id}");
+            return ToCompany<T>(response, registry.Get(typeof(T)));
+        }
+
+        /// <summary>
+        /// get a company by it's id
+        /// </summary>
+        /// <typeparam name="T">type of company model</typeparam>
+        /// <param name="id">id of company to return</param>
+        /// <returns>company data</returns>
+        public async Task<T> Get<T>(long id)
+            where T : HubSpotCompany {
+            JObject response = await rest.Get($"companies/v2/companies/{id}");
             return ToCompany<T>(response, registry.Get(typeof(T)));
         }
     }

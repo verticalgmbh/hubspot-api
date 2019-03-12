@@ -1,5 +1,6 @@
 ﻿using System;
 using Vertical.HubSpot.Api.Companies;
+using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api {
@@ -19,8 +20,14 @@ namespace Vertical.HubSpot.Api {
         public HubSpot(string apikey) {
             ModelRegistry registry = new ModelRegistry();
             HubSpotRestClient restclient = new HubSpotRestClient(apikey, new Uri("https://api.hubapi.com/"));
+            Contacts = new ContactApi(restclient, registry);
             Companies = new CompanyApi(restclient, registry);
         }
+
+        /// <summary>
+        /// access to contacts
+        /// </summary>
+        public ContactApi Contacts { get; }
 
         /// <summary>
         /// access to companies

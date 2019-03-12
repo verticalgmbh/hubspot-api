@@ -28,8 +28,7 @@ namespace Vertical.HubSpot.Api.Models {
                             continue;
 
                         string mappingname = property.Name.ToLower();
-                        NameAttribute name = Attribute.GetCustomAttribute(property, typeof(NameAttribute)) as NameAttribute;
-                        if (name != null)
+                        if (Attribute.GetCustomAttribute(property, typeof(NameAttribute)) is NameAttribute name)
                             mappingname = name.Name;
                         model.AddProperty(property, mappingname);
                     }

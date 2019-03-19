@@ -51,7 +51,7 @@ namespace Vertical.HubSpot.Api.Contacts {
             foreach (KeyValuePair<string, PropertyInfo> property in model.Properties) {
                 properties.Add(new JObject {
                     ["property"] = property.Key,
-                    ["value"] = new JValue(property.Value.GetValue(model))
+                    ["value"] = new JValue(property.Value.GetValue(contact))
                 });
             }
             request["properties"] = properties;
@@ -77,7 +77,7 @@ namespace Vertical.HubSpot.Api.Contacts {
                 properties.Add(new JObject
                 {
                     ["property"] = property.Key,
-                    ["value"] = new JValue(property.Value.GetValue(model))
+                    ["value"] = new JValue(property.Value.GetValue(contact))
                 });
             }
             request["properties"] = properties;

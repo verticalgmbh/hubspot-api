@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json.Linq;
 using Vertical.HubSpot.Api.Data;
+using Vertical.HubSpot.Api.Logging;
 
 namespace Vertical.HubSpot.Api {
 
@@ -28,10 +29,27 @@ namespace Vertical.HubSpot.Api {
 
         async void CheckForError(HttpResponseMessage response) {
             if(!response.IsSuccessStatusCode) {
-                if (response.Content.Headers.ContentLength == 0)
+                if (response.Content.Headers.ContentLength == 0) {
+                    Logger.Error(this, $"{response.StatusCode}: {response.ReasonPhrase}");
                     throw new HubSpotException($"{response.StatusCode}: {response.ReasonPhrase}");
-                throw new HubSpotException(await response.Content.ReadAsStringAsync());
+                }
+
+                string errorstring = await response.Content.ReadAsStringAsync();
+                Logger.Error(this, errorstring);
+                throw new HubSpotException(errorstring);
             }
+        }
+
+        async Task<JObject> ReadResponse(HttpResponseMessage message) {
+            if (message.Content.Headers.ContentLength > 0)
+            {
+                string responsestring = await message.Content.ReadAsStringAsync();
+                Logger.Info(this, "Response", responsestring);
+                return JObject.Parse(responsestring);
+            }
+
+            Logger.Info(this, "No response body");
+            return null;
         }
 
         /// <summary>
@@ -50,9 +68,7 @@ namespace Vertical.HubSpot.Api {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response=await client.PostAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
                 CheckForError(response);
-                if(response.Content.Headers.ContentLength>0)
-                    return JObject.Parse(await response.Content.ReadAsStringAsync());
-                return null;
+                return await ReadResponse(response);
             }
         }
 
@@ -73,10 +89,7 @@ namespace Vertical.HubSpot.Api {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response = await client.PutAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
                 CheckForError(response);
-
-                if (response.Content.Headers.ContentLength > 0)
-                    return JObject.Parse(await response.Content.ReadAsStringAsync());
-                return null;
+                return await ReadResponse(response);
             }
         }
 
@@ -93,7 +106,7 @@ namespace Vertical.HubSpot.Api {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response = await client.DeleteAsync(url);
                 CheckForError(response);
-                return JObject.Parse(await response.Content.ReadAsStringAsync());
+                return await ReadResponse(response);
             }
         }
 
@@ -113,7 +126,7 @@ namespace Vertical.HubSpot.Api {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response = await client.GetAsync(url);
                 CheckForError(response);
-                return JObject.Parse(await response.Content.ReadAsStringAsync());
+                return await ReadResponse(response);
             }
         }
     }

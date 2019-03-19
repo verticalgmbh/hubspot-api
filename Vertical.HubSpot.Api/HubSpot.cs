@@ -1,4 +1,5 @@
 ﻿using System;
+using Vertical.HubSpot.Api.Associations;
 using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Models;
@@ -22,6 +23,7 @@ namespace Vertical.HubSpot.Api {
             HubSpotRestClient restclient = new HubSpotRestClient(apikey, new Uri("https://api.hubapi.com/"));
             Contacts = new ContactApi(restclient, registry);
             Companies = new CompanyApi(restclient, registry);
+            Associations = new AssociationApi(restclient);
         }
 
         /// <summary>
@@ -33,5 +35,10 @@ namespace Vertical.HubSpot.Api {
         /// access to companies
         /// </summary>
         public CompanyApi Companies { get; }
+
+        /// <summary>
+        /// access to associations
+        /// </summary>
+        public AssociationApi Associations { get; }
     }
 }

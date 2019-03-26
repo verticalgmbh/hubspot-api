@@ -2,6 +2,7 @@
 using Vertical.HubSpot.Api.Associations;
 using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
+using Vertical.HubSpot.Api.Deals;
 using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api {
@@ -24,6 +25,7 @@ namespace Vertical.HubSpot.Api {
             Contacts = new ContactApi(restclient, registry);
             Companies = new CompanyApi(restclient, registry);
             Associations = new AssociationApi(restclient);
+            Deals = new DealsApi(restclient, registry);
         }
 
         /// <summary>
@@ -40,5 +42,10 @@ namespace Vertical.HubSpot.Api {
         /// access to associations
         /// </summary>
         public AssociationApi Associations { get; }
+
+        /// <summary>
+        /// access to deals
+        /// </summary>
+        public DealsApi Deals { get; }
     }
 }

@@ -12,8 +12,8 @@ namespace Vertical.HubSpot.Api.Extensions
     /// <summary>
     /// extensions for data structures
     /// </summary>
-    static class DataExtensions
-    {
+    static class DataExtensions {
+        static DateTime unixstart = new DateTime(1970, 1, 1);
 
         /// <summary>
         /// converts a json response to a <see cref="HubSpotContact"/>
@@ -40,5 +40,14 @@ namespace Vertical.HubSpot.Api.Extensions
             return result;
         }
 
+        /// <summary>
+        /// converts a datetime to a unix timestamp
+        /// </summary>
+        /// <param name="date">date to be converted</param>
+        /// <returns>milliseconds which passed since 1970-01-01</returns>
+        public static long ToUnixTimestamp(this DateTime date) {
+
+            return (long) (date - unixstart).TotalMilliseconds;
+        }
     }
 }

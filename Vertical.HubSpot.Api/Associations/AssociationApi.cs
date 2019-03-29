@@ -44,7 +44,7 @@ namespace Vertical.HubSpot.Api.Associations
                 ["definitionId"] = (int) type
             };
 
-            await rest.Put("crm-associations/v1/associations", request);
+            await rest.Put<JObject>("crm-associations/v1/associations", request);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Vertical.HubSpot.Api.Associations
                 });
             }
 
-            await rest.Put("crm-associations/v1/associations/create-batch", request);
+            await rest.Put<JObject>("crm-associations/v1/associations/create-batch", request);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Vertical.HubSpot.Api.Associations
         /// <param name="offset">page token used to get next page in multipage result (optional)</param>
         /// <returns>one page of list results</returns>
         public async Task<PageResponse<long>> ListPage(long objectid, AssociationType type, long? offset=null) {
-            JObject response = await rest.Get($"crm-associations/v1/associations/{objectid}/HUBSPOT_DEFINED/{(int) type}", GetListParameters(offset).ToArray());
+            JObject response = await rest.Get<JObject>($"crm-associations/v1/associations/{objectid}/HUBSPOT_DEFINED/{(int) type}", GetListParameters(offset).ToArray());
 
             return new PageResponse<long> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
@@ -121,7 +121,7 @@ namespace Vertical.HubSpot.Api.Associations
                 ["definitionId"] = (int)type
             };
 
-            await rest.Put("crm-associations/v1/associations/delete", request);
+            await rest.Put<JObject>("crm-associations/v1/associations/delete", request);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Vertical.HubSpot.Api.Associations
                 });
             }
 
-            await rest.Put("crm-associations/v1/associations/delete-batch", request);
+            await rest.Put<JObject>("crm-associations/v1/associations/delete-batch", request);
         }
 
     }

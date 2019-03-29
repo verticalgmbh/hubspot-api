@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NightlyCode.Core.Conversion;
-using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
@@ -83,7 +82,7 @@ namespace Vertical.HubSpot.Api.Deals
 
             request["properties"] = properties;
 
-            JObject response = await rest.Post("deals/v1/deal", request);
+            JObject response = await rest.Post<JObject>("deals/v1/deal", request);
             return ToDeal<T>(response, model);
         }
 
@@ -111,7 +110,7 @@ namespace Vertical.HubSpot.Api.Deals
 
             request["properties"] = properties;
 
-            JObject response = await rest.Put($"deals/v1/deal/{dealdata.ID}", request);
+            JObject response = await rest.Put<JObject>($"deals/v1/deal/{dealdata.ID}", request);
             return ToDeal<T>(response, model);
         }
 
@@ -144,7 +143,7 @@ namespace Vertical.HubSpot.Api.Deals
                 request.Add(requestobject);
             }
 
-            await rest.Post("deals/v1/batch-async/update", request);
+            await rest.Post<JObject>("deals/v1/batch-async/update", request);
         }
 
         IEnumerable<Parameter> GetListParameters(long? offset, params string[] properties) {
@@ -177,7 +176,7 @@ namespace Vertical.HubSpot.Api.Deals
         {
             EntityModel model = registry.Get(typeof(T));
 
-            JObject response = await rest.Get("deals/v1/deal/paged", GetListParameters(offset, properties).ToArray());
+            JObject response = await rest.Get<JObject>("deals/v1/deal/paged", GetListParameters(offset, properties).ToArray());
 
             return new PageResponse<T>
             {
@@ -218,7 +217,7 @@ namespace Vertical.HubSpot.Api.Deals
         {
             EntityModel model = registry.Get(typeof(T));
 
-            JObject response = await rest.Get("deals/v1/deal/recent/modified", GetRecentParameters(since, offset).ToArray());
+            JObject response = await rest.Get<JObject>("deals/v1/deal/recent/modified", GetRecentParameters(since, offset).ToArray());
 
             return new PageResponse<T>
             {
@@ -239,7 +238,7 @@ namespace Vertical.HubSpot.Api.Deals
         {
             EntityModel model = registry.Get(typeof(T));
 
-            JObject response = await rest.Get("deals/v1/deal/recent/created", GetRecentParameters(since, offset).ToArray());
+            JObject response = await rest.Get<JObject>("deals/v1/deal/recent/created", GetRecentParameters(since, offset).ToArray());
 
             return new PageResponse<T>
             {
@@ -257,7 +256,7 @@ namespace Vertical.HubSpot.Api.Deals
         public async Task<T> Delete<T>(long id)
             where T : HubSpotDeal
         {
-            JObject response = await rest.Delete($"deals/v1/deal/{id}");
+            JObject response = await rest.Delete<JObject>($"deals/v1/deal/{id}");
             return ToDeal<T>(response, registry.Get(typeof(T)));
         }
 
@@ -270,7 +269,7 @@ namespace Vertical.HubSpot.Api.Deals
         public async Task<T> Get<T>(long id)
             where T : HubSpotDeal
         {
-            JObject response = await rest.Get($"deals/v1/deal/{id}");
+            JObject response = await rest.Get<JObject>($"deals/v1/deal/{id}");
             return ToDeal<T>(response, registry.Get(typeof(T)));
         }
 

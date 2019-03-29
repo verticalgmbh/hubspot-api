@@ -66,7 +66,7 @@ namespace Vertical.HubSpot.Api.Companies {
 
             request["properties"] = properties;
 
-            JObject response = await rest.Post("companies/v2/companies", request);
+            JObject response = await rest.Post<JObject>("companies/v2/companies", request);
             return ToCompany<T>(response, model);
         }
 
@@ -94,7 +94,7 @@ namespace Vertical.HubSpot.Api.Companies {
 
             request["properties"] = properties;
 
-            JObject response = await rest.Put($"companies/v2/companies/{company.ID}", request);
+            JObject response = await rest.Put<JObject>($"companies/v2/companies/{company.ID}", request);
             return ToCompany<T>(response, model);
         }
 
@@ -126,7 +126,7 @@ namespace Vertical.HubSpot.Api.Companies {
                 request.Add(updaterequest);
             }
 
-            await rest.Post("companies/v1/batch-async/update", request);
+            await rest.Post<JObject>("companies/v1/batch-async/update", request);
         }
 
         IEnumerable<Parameter> GetListParameters(long? offset, params string[] properties) {
@@ -149,7 +149,7 @@ namespace Vertical.HubSpot.Api.Companies {
         {
             EntityModel model = registry.Get(typeof(T));
 
-            JObject response = await rest.Get("companies/v2/companies/paged", GetListParameters(offset, properties).ToArray());
+            JObject response = await rest.Get<JObject>("companies/v2/companies/paged", GetListParameters(offset, properties).ToArray());
 
             return new PageResponse<T> {
                 Offset = response.Value<bool>("has-more") ? response.Value<long?>("offset") : null,
@@ -168,7 +168,7 @@ namespace Vertical.HubSpot.Api.Companies {
         {
             EntityModel model = registry.Get(typeof(T));
 
-            JObject response = await rest.Get("companies/v2/companies/recent/modified", GetListParameters(offset).ToArray());
+            JObject response = await rest.Get<JObject>("companies/v2/companies/recent/modified", GetListParameters(offset).ToArray());
 
             return new PageResponse<T>
             {
@@ -188,7 +188,7 @@ namespace Vertical.HubSpot.Api.Companies {
         {
             EntityModel model = registry.Get(typeof(T));
 
-            JObject response = await rest.Get("companies/v2/companies/recent/created", GetListParameters(offset).ToArray());
+            JObject response = await rest.Get<JObject>("companies/v2/companies/recent/created", GetListParameters(offset).ToArray());
 
             return new PageResponse<T>
             {
@@ -219,7 +219,7 @@ namespace Vertical.HubSpot.Api.Companies {
                     ["companyId"] = offset ?? 0
                 }
             };
-            JObject response = await rest.Post($"companies/v2/domains/{domain}/companies", request);
+            JObject response = await rest.Post<JObject>($"companies/v2/domains/{domain}/companies", request);
 
             return new PageResponse<T>
             {
@@ -254,7 +254,7 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <returns>deleted company</returns>
         public async Task<T> Delete<T>(long id)
             where T : HubSpotCompany {
-            JObject response = await rest.Delete($"companies/v2/companies/{id}");
+            JObject response = await rest.Delete<JObject>($"companies/v2/companies/{id}");
             return ToCompany<T>(response, registry.Get(typeof(T)));
         }
 
@@ -266,7 +266,7 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <returns>company data</returns>
         public async Task<T> Get<T>(long id)
             where T : HubSpotCompany {
-            JObject response = await rest.Get($"companies/v2/companies/{id}");
+            JObject response = await rest.Get<JObject>($"companies/v2/companies/{id}");
             return ToCompany<T>(response, registry.Get(typeof(T)));
         }
     }

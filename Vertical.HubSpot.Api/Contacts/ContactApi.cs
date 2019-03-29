@@ -56,7 +56,7 @@ namespace Vertical.HubSpot.Api.Contacts {
             }
             request["properties"] = properties;
 
-            JObject response = await rest.Post($"contacts/v1/contact/createOrUpdate/email/{email}", request);
+            JObject response = await rest.Post<JObject>($"contacts/v1/contact/createOrUpdate/email/{email}", request);
             return response.Value<long>("vid");
         }
 
@@ -82,7 +82,7 @@ namespace Vertical.HubSpot.Api.Contacts {
             }
             request["properties"] = properties;
 
-            await rest.Post($"contacts/v1/contact/vid/{contact.ID}/profile", request);
+            await rest.Post<JObject>($"contacts/v1/contact/vid/{contact.ID}/profile", request);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// </summary>
         /// <param name="id">id of contact</param>
         public async Task Delete(long id) {
-            await rest.Delete($"contacts/v1/contact/vid/{id}");
+            await rest.Delete<JObject>($"contacts/v1/contact/vid/{id}");
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Vertical.HubSpot.Api.Contacts {
         {
             EntityModel model = models.Get(typeof(T));
 
-            JObject response = await rest.Get("contacts/v1/lists/all/contacts/all", GetListParameters(offset, properties).ToArray());
+            JObject response = await rest.Get<JObject>("contacts/v1/lists/all/contacts/all", GetListParameters(offset, properties).ToArray());
 
             return new PageResponse<T>
             {
@@ -122,7 +122,7 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <returns>contact data</returns>
         public async Task<T> Get<T>(long id)
             where T : HubSpotContact {
-            JObject response = await rest.Get($"contacts/v1/contact/vid/{id}/profile");
+            JObject response = await rest.Get<JObject>($"contacts/v1/contact/vid/{id}/profile");
             EntityModel model = models.Get(typeof(T));
             return response.ToContact<T>(model);
         }

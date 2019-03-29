@@ -27,25 +27,30 @@ namespace Vertical.HubSpot.Api {
             this.baseaddress = baseaddress;
         }
 
-        async void CheckForError(HttpResponseMessage response) {
+        async Task CheckForError(JToken request, HttpResponseMessage response) {
             if(!response.IsSuccessStatusCode) {
                 if (response.Content.Headers.ContentLength == 0) {
                     Logger.Error(this, $"{response.StatusCode}: {response.ReasonPhrase}");
-                    throw new HubSpotException($"{response.StatusCode}: {response.ReasonPhrase}");
+                    throw new HubSpotException($"{response.StatusCode}: {response.ReasonPhrase}", request);
                 }
 
                 string errorstring = await response.Content.ReadAsStringAsync();
                 Logger.Error(this, errorstring);
-                throw new HubSpotException(errorstring);
+                throw new HubSpotException(errorstring, request);
             }
         }
 
-        async Task<JObject> ReadResponse(HttpResponseMessage message) {
+        async Task<T> ReadResponse<T>(HttpResponseMessage message)
+        where T : JToken
+        {
             if (message.Content.Headers.ContentLength > 0)
             {
                 string responsestring = await message.Content.ReadAsStringAsync();
                 Logger.Info(this, "Response", responsestring);
-                return JObject.Parse(responsestring);
+                JToken response=JToken.Parse(responsestring);
+                if(!(response is T))
+                    throw new InvalidOperationException($"Response is not {nameof(T)}");
+                return (T) response;
             }
 
             Logger.Info(this, "No response body");
@@ -59,7 +64,9 @@ namespace Vertical.HubSpot.Api {
         /// <param name="request">request data</param>
         /// <param name="parameters">additional query parameters</param>
         /// <returns>response data</returns>
-        public async Task<JObject> Post(string url, JToken request, params Parameter[] parameters) {
+        public async Task<T> Post<T>(string url, JToken request, params Parameter[] parameters)
+            where T : JToken
+        {
             url += $"?hapikey={apikey}";
             if (parameters.Length > 0)
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
@@ -67,8 +74,8 @@ namespace Vertical.HubSpot.Api {
             using (HttpClient client = new HttpClient()) {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response=await client.PostAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
-                CheckForError(response);
-                return await ReadResponse(response);
+                await CheckForError(request, response);
+                return await ReadResponse<T>(response);
             }
         }
 
@@ -79,7 +86,8 @@ namespace Vertical.HubSpot.Api {
         /// <param name="request">request data</param>
         /// <param name="parameters">additional query parameters</param>
         /// <returns>response data</returns>
-        public async Task<JObject> Put(string url, JToken request, params Parameter[] parameters)
+        public async Task<T> Put<T>(string url, JToken request, params Parameter[] parameters)
+            where T : JToken
         {
             url += $"?hapikey={apikey}";
             if (parameters.Length > 0)
@@ -88,8 +96,8 @@ namespace Vertical.HubSpot.Api {
             using (HttpClient client = new HttpClient()) {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response = await client.PutAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
-                CheckForError(response);
-                return await ReadResponse(response);
+                await CheckForError(request, response);
+                return await ReadResponse<T>(response);
             }
         }
 
@@ -98,15 +106,16 @@ namespace Vertical.HubSpot.Api {
         /// </summary>
         /// <param name="url">url to post the request to</param>
         /// <returns>response data</returns>
-        public async Task<JObject> Delete(string url)
+        public async Task<T> Delete<T>(string url)
+            where T : JToken
         {
             url += $"?hapikey={apikey}";
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response = await client.DeleteAsync(url);
-                CheckForError(response);
-                return await ReadResponse(response);
+                await CheckForError(null, response);
+                return await ReadResponse<T>(response);
             }
         }
 
@@ -116,7 +125,9 @@ namespace Vertical.HubSpot.Api {
         /// <param name="url">url to post the request to</param>
         /// <param name="parameters">additional query parameters</param>
         /// <returns>response data</returns>
-        public async Task<JObject> Get(string url, params Parameter[] parameters) {
+        public async Task<T> Get<T>(string url, params Parameter[] parameters)
+            where T : JToken
+        {
             url += $"?hapikey={apikey}";
             if (parameters.Length > 0)
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
@@ -125,8 +136,8 @@ namespace Vertical.HubSpot.Api {
             {
                 client.BaseAddress = baseaddress;
                 HttpResponseMessage response = await client.GetAsync(url);
-                CheckForError(response);
-                return await ReadResponse(response);
+                await CheckForError(null, response);
+                return await ReadResponse<T>(response);
             }
         }
     }

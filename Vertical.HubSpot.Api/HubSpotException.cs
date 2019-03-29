@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json.Linq;
 
 namespace Vertical.HubSpot.Api {
 
@@ -11,7 +12,9 @@ namespace Vertical.HubSpot.Api {
         /// creates a new <see cref="HubSpotException"/>
         /// </summary>
         /// <param name="message">message describing error</param>
-        public HubSpotException(string message) : base(message) {
+        /// <param name="request">original request sent to hubspot</param>
+        public HubSpotException(string message, JToken request) 
+            : this(message, null, request) {
         }
 
         /// <summary>
@@ -19,8 +22,15 @@ namespace Vertical.HubSpot.Api {
         /// </summary>
         /// <param name="message">message describing error</param>
         /// <param name="innerException">exception which is the source for this exception</param>
-        public HubSpotException(string message, Exception innerException) 
+        /// <param name="request">original request sent to hubspot</param>
+        public HubSpotException(string message, Exception innerException, JToken request) 
             : base(message, innerException) {
+            Request = request;
         }
+
+        /// <summary>
+        /// original request to hubspot
+        /// </summary>
+        public JToken Request { get; }
     }
 }

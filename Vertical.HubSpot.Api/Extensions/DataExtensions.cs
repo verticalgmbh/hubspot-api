@@ -4,6 +4,7 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NightlyCode.Core.Conversion;
 using Vertical.HubSpot.Api.Contacts;
+using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api.Extensions
@@ -13,7 +14,7 @@ namespace Vertical.HubSpot.Api.Extensions
     /// extensions for data structures
     /// </summary>
     static class DataExtensions {
-        static DateTime unixstart = new DateTime(1970, 1, 1);
+        static readonly DateTime unixstart = new DateTime(1970, 1, 1);
 
         /// <summary>
         /// converts a json response to a <see cref="HubSpotContact"/>
@@ -31,6 +32,34 @@ namespace Vertical.HubSpot.Api.Extensions
 
             JObject responseproperties = (JObject)contact["properties"];
             foreach (KeyValuePair<string, JToken> property in responseproperties) {
+                PropertyInfo objectproperty = model.GetProperty(property.Key);
+                if (objectproperty == null)
+                    continue;
+                objectproperty.SetValue(result, Converter.Convert(property.Value.Value<object>("value"), objectproperty.PropertyType));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// converts a json response to a <see cref="HubSpotContact"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="contact">json containing contact data</param>
+        /// <param name="model">model for contact entity</param>
+        /// <returns></returns>
+        public static T ToEntity<T>(this JObject contact, EntityModel model)
+        where T : HubspotObject
+        {
+            T result = Activator.CreateInstance<T>();
+
+            // TODO: add these properties to model and flag them as not to be posted on requests
+            result.ID = contact.Value<long>("objectId");
+            result.IsDeleted = contact.Value<bool>("isDeleted");
+
+            JObject responseproperties = (JObject)contact["properties"];
+            foreach (KeyValuePair<string, JToken> property in responseproperties)
+            {
                 PropertyInfo objectproperty = model.GetProperty(property.Key);
                 if (objectproperty == null)
                     continue;

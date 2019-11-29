@@ -58,7 +58,7 @@ namespace Vertical.HubSpot.Api {
         /// <param name="associations">associations api to use</param>
         /// <param name="deals">deals api to use</param>
         /// <param name="tickets">tickets api to use</param>
-        public HubSpot(ContactApi contacts, CompanyApi companies, AssociationApi associations, DealsApi deals, ITicketsApi tickets) {
+        public HubSpot(IContactApi contacts, ICompanyApi companies, IAssociationApi associations, IDealsApi deals, ITicketsApi tickets) {
             Contacts = contacts;
             Companies = companies;
             Associations = associations;
@@ -69,22 +69,22 @@ namespace Vertical.HubSpot.Api {
         /// <summary>
         /// access to contacts
         /// </summary>
-        public ContactApi Contacts { get; }
+        public IContactApi Contacts { get; }
 
         /// <summary>
         /// access to companies
         /// </summary>
-        public CompanyApi Companies { get; }
+        public ICompanyApi Companies { get; }
 
         /// <summary>
         /// access to associations
         /// </summary>
-        public AssociationApi Associations { get; }
+        public IAssociationApi Associations { get; }
 
         /// <summary>
         /// access to deals
         /// </summary>
-        public DealsApi Deals { get; }
+        public IDealsApi Deals { get; }
 
         /// <inheritdoc />
         public ITicketsApi Tickets { get; }

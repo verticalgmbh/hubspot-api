@@ -13,22 +13,22 @@ namespace Vertical.HubSpot.Api {
         /// <summary>
         /// access to contacts
         /// </summary>
-        ContactApi Contacts { get; }
+        IContactApi Contacts { get; }
 
         /// <summary>
         /// access to companies
         /// </summary>
-        CompanyApi Companies { get; }
+        ICompanyApi Companies { get; }
 
         /// <summary>
         /// access to associations
         /// </summary>
-        AssociationApi Associations { get; }
+        IAssociationApi Associations { get; }
 
         /// <summary>
         /// access to deals
         /// </summary>
-        DealsApi Deals { get; }
+        IDealsApi Deals { get; }
 
         /// <summary>
         /// access to ticket information

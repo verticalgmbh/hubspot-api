@@ -8,11 +8,10 @@ using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api.Contacts {
-
     /// <summary>
     /// access to contacts api
     /// </summary>
-    public class ContactApi {
+    public class ContactApi : IContactApi {
         readonly HubSpotRestClient rest;
         readonly ModelRegistry models;
 

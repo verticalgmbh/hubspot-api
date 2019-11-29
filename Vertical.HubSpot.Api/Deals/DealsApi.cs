@@ -11,12 +11,10 @@ using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api.Deals
 {
-
     /// <summary>
     /// api used to manage deals in hubspot
     /// </summary>
-    public class DealsApi
-    {
+    public class DealsApi : IDealsApi {
         readonly HubSpotRestClient rest;
         readonly ModelRegistry registry;
 

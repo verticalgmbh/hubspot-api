@@ -9,11 +9,10 @@ using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api.Companies {
-
     /// <summary>
     /// access to company api
     /// </summary>
-    public class CompanyApi {
+    public class CompanyApi : ICompanyApi {
         readonly HubSpotRestClient rest;
         readonly ModelRegistry registry;
 

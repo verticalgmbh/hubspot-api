@@ -7,12 +7,10 @@ using Vertical.HubSpot.Api.Data;
 
 namespace Vertical.HubSpot.Api.Associations
 {
-
     /// <summary>
     /// api used to associate objects in crm
     /// </summary>
-    public class AssociationApi
-    {
+    public class AssociationApi : IAssociationApi {
         readonly HubSpotRestClient rest;
 
         /// <summary>

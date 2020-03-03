@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,8 +10,7 @@ using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
 
-namespace Vertical.HubSpot.Api.Deals
-{
+namespace Vertical.HubSpot.Api.Deals {
     /// <summary>
     /// api used to manage deals in hubspot
     /// </summary>
@@ -29,21 +29,19 @@ namespace Vertical.HubSpot.Api.Deals
         }
 
         T ToDeal<T>(JObject deal, EntityModel model)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             T result = Activator.CreateInstance<T>();
             result.ID = deal.Value<long>("dealId");
             result.IsDeleted = deal.Value<bool>("isDeleted");
 
-            JObject associations = (JObject) deal["associations"];
+            JObject associations = (JObject)deal["associations"];
             result.Contacts = associations.ContainsKey("associatedVids") ? associations["associatedVids"].Values<long>().ToArray() : new long[0];
             result.Companies = associations.ContainsKey("associatedCompanyIds") ? associations["associatedCompanyIds"].Values<long>().ToArray() : new long[0];
             result.Deals = associations.ContainsKey("associatedDealIds") ? associations["associatedDealIds"].Values<long>().ToArray() : new long[0];
 
             JObject responseproperties = (JObject)deal["properties"];
-            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-            {
-                if (responseproperties.ContainsKey(property.Key))
+            foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                if(responseproperties.ContainsKey(property.Key))
                     property.Value.SetValue(result, Converter.Convert(responseproperties[property.Key].Value<object>("value"), property.Value.PropertyType));
             }
 
@@ -57,8 +55,7 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="dealdata">data of deal to create</param>
         /// <returns>created deal</returns>
         public async Task<T> Create<T>(T dealdata)
-        where T : HubSpotDeal
-        {
+        where T : HubSpotDeal {
             EntityModel model = registry.Get(typeof(T));
 
             JObject request = new JObject {
@@ -69,12 +66,10 @@ namespace Vertical.HubSpot.Api.Deals
             };
 
             JArray properties = new JArray();
-            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-            {
-                properties.Add(new JObject
-                {
+            foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                properties.Add(new JObject {
                     ["name"] = property.Key,
-                    ["value"] = property.Value.GetValue(dealdata)?.ToString()
+                    ["value"] = Convert.ToString(property.Value.GetValue(dealdata), CultureInfo.InvariantCulture)
                 });
             }
 
@@ -91,18 +86,15 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="dealdata">data to update</param>
         /// <returns>updated deal</returns>
         public async Task<T> Update<T>(T dealdata)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             EntityModel model = registry.Get(typeof(T));
 
             JObject request = new JObject();
             JArray properties = new JArray();
-            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-            {
-                properties.Add(new JObject
-                {
+            foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                properties.Add(new JObject {
                     ["name"] = property.Key,
-                    ["value"] = property.Value.GetValue(dealdata)?.ToString()
+                    ["value"] = Convert.ToString(property.Value.GetValue(dealdata), CultureInfo.InvariantCulture)
                 });
             }
 
@@ -121,19 +113,17 @@ namespace Vertical.HubSpot.Api.Deals
             where T : HubSpotDeal {
             EntityModel model = registry.Get(typeof(T));
 
-            JArray request=new JArray();
-            foreach (T deal in deals) {
+            JArray request = new JArray();
+            foreach(T deal in deals) {
                 JObject requestobject = new JObject {
                     ["objectId"] = deal.ID
                 };
 
                 JArray properties = new JArray();
-                foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-                {
-                    properties.Add(new JObject
-                    {
+                foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                    properties.Add(new JObject {
                         ["name"] = property.Key,
-                        ["value"] = property.Value.GetValue(deal)?.ToString()
+                        ["value"] = Convert.ToString(property.Value.GetValue(deal), CultureInfo.InvariantCulture)
                     });
                 }
 
@@ -147,18 +137,17 @@ namespace Vertical.HubSpot.Api.Deals
         IEnumerable<Parameter> GetListParameters(long? offset, params string[] properties) {
             yield return new Parameter("includeAssociations", "true");
             yield return new Parameter("limit", "250");
-            if (offset.HasValue)
+            if(offset.HasValue)
                 yield return new Parameter("offset", offset?.ToString());
-            foreach (string property in properties)
+            foreach(string property in properties)
                 yield return new Parameter("properties", property);
         }
 
-        IEnumerable<Parameter> GetRecentParameters(DateTime? since, long? offset)
-        {
+        IEnumerable<Parameter> GetRecentParameters(DateTime? since, long? offset) {
             yield return new Parameter("count", "100");
-            if (offset.HasValue)
+            if(offset.HasValue)
                 yield return new Parameter("offset", offset?.ToString());
-            if (since.HasValue)
+            if(since.HasValue)
                 yield return new Parameter("since", since.Value.ToUnixTimestamp().ToString());
         }
 
@@ -170,14 +159,12 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="properties">properties to include in result</param>
         /// <returns>one page of deal list response</returns>
         public async Task<PageResponse<T>> ListPage<T>(long? offset = null, params string[] properties)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             EntityModel model = registry.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("deals/v1/deal/paged", GetListParameters(offset, properties).ToArray());
 
-            return new PageResponse<T>
-            {
+            return new PageResponse<T> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("deals").OfType<JObject>().Select(d => ToDeal<T>(d, model)).ToArray()
             };
@@ -190,15 +177,13 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="properties">properties to include in result</param>
         /// <returns>list of all deals</returns>
         public async Task<T[]> List<T>(params string[] properties)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             List<T> result = new List<T>();
             PageResponse<T> response = null;
-            do
-            {
+            do {
                 response = await ListPage<T>(response?.Offset, properties);
                 result.AddRange(response.Data);
-            } while (response.Offset.HasValue);
+            } while(response.Offset.HasValue);
 
             return result.ToArray();
         }
@@ -211,14 +196,12 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="offset">offset to use to get a specific result page (optional)</param>
         /// <returns>a page of recently modified deals</returns>
         public async Task<PageResponse<T>> RecentlyModifiedPage<T>(DateTime? since, long? offset = null)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             EntityModel model = registry.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("deals/v1/deal/recent/modified", GetRecentParameters(since, offset).ToArray());
 
-            return new PageResponse<T>
-            {
+            return new PageResponse<T> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToDeal<T>(d, model)).ToArray()
             };
@@ -232,14 +215,12 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="offset">offset to use to get a specific result page (optional)</param>
         /// <returns>a page of recently modified deals</returns>
         public async Task<PageResponse<T>> RecentlyCreatedPage<T>(DateTime? since, long? offset = null)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             EntityModel model = registry.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("deals/v1/deal/recent/created", GetRecentParameters(since, offset).ToArray());
 
-            return new PageResponse<T>
-            {
+            return new PageResponse<T> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToDeal<T>(d, model)).ToArray()
             };
@@ -252,8 +233,7 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="id">deal id</param>
         /// <returns>deleted deal</returns>
         public async Task<T> Delete<T>(long id)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             JObject response = await rest.Delete<JObject>($"deals/v1/deal/{id}");
             return ToDeal<T>(response, registry.Get(typeof(T)));
         }
@@ -265,8 +245,7 @@ namespace Vertical.HubSpot.Api.Deals
         /// <param name="id">id of deal to return</param>
         /// <returns>deal data</returns>
         public async Task<T> Get<T>(long id)
-            where T : HubSpotDeal
-        {
+            where T : HubSpotDeal {
             JObject response = await rest.Get<JObject>($"deals/v1/deal/{id}");
             return ToDeal<T>(response, registry.Get(typeof(T)));
         }

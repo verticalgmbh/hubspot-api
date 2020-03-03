@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -27,16 +28,14 @@ namespace Vertical.HubSpot.Api.Companies {
         }
 
         T ToCompany<T>(JObject company, EntityModel model)
-        where T : HubSpotCompany
-        {
+        where T : HubSpotCompany {
             T result = Activator.CreateInstance<T>();
             result.ID = company.Value<long>("companyId");
             result.IsDeleted = company.Value<bool>("isDeleted");
 
             JObject responseproperties = (JObject)company["properties"];
-            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-            {
-                if (responseproperties.ContainsKey(property.Key))
+            foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                if(responseproperties.ContainsKey(property.Key))
                     property.Value.SetValue(result, Converter.Convert(responseproperties[property.Key].Value<object>("value"), property.Value.PropertyType));
             }
 
@@ -50,16 +49,15 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <param name="company">company data to create</param>
         /// <returns>created entity</returns>
         public async Task<T> Create<T>(T company)
-        where T : HubSpotCompany
-        {
+        where T : HubSpotCompany {
             EntityModel model = registry.Get(typeof(T));
 
             JObject request = new JObject();
             JArray properties = new JArray();
-            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties) {
+            foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
                 properties.Add(new JObject {
                     ["name"] = property.Key,
-                    ["value"] = property.Value.GetValue(company)?.ToString()
+                    ["value"] = Convert.ToString(property.Value.GetValue(company), CultureInfo.InvariantCulture)
                 });
             }
 
@@ -76,18 +74,15 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <param name="company">company data to update</param>
         /// <returns>updated company</returns>
         public async Task<T> Update<T>(T company)
-        where T : HubSpotCompany
-        {
+        where T : HubSpotCompany {
             EntityModel model = registry.Get(typeof(T));
 
             JObject request = new JObject();
             JArray properties = new JArray();
-            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-            {
-                properties.Add(new JObject
-                {
+            foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                properties.Add(new JObject {
                     ["name"] = property.Key,
-                    ["value"] = property.Value.GetValue(company)?.ToString()
+                    ["value"] = Convert.ToString(property.Value.GetValue(company), CultureInfo.InvariantCulture)
                 });
             }
 
@@ -107,18 +102,16 @@ namespace Vertical.HubSpot.Api.Companies {
             EntityModel model = registry.Get(typeof(T));
 
             JArray request = new JArray();
-            foreach (T company in companies) {
+            foreach(T company in companies) {
                 JObject updaterequest = new JObject {
                     ["objectId"] = company.ID
                 };
 
                 JArray properties = new JArray();
-                foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
-                {
-                    properties.Add(new JObject
-                    {
+                foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
+                    properties.Add(new JObject {
                         ["name"] = property.Key,
-                        ["value"] = property.Value.GetValue(company)?.ToString()
+                        ["value"] = Convert.ToString(property.Value.GetValue(company), CultureInfo.InvariantCulture)
                     });
                 }
                 updaterequest["properties"] = properties;
@@ -130,9 +123,9 @@ namespace Vertical.HubSpot.Api.Companies {
 
         IEnumerable<Parameter> GetListParameters(long? offset, params string[] properties) {
             yield return new Parameter("limit", "250");
-            if (offset.HasValue)
+            if(offset.HasValue)
                 yield return new Parameter("offset", offset?.ToString());
-            foreach (string property in properties)
+            foreach(string property in properties)
                 yield return new Parameter("properties", property);
         }
 
@@ -143,9 +136,8 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <param name="offset">offset to use to get a specific result page (optional)</param>
         /// <param name="properties">properties to include in result</param>
         /// <returns>one page of company list response</returns>
-        public async Task<PageResponse<T>> ListPage<T>(long? offset=null, params string[] properties)
-            where T:HubSpotCompany
-        {
+        public async Task<PageResponse<T>> ListPage<T>(long? offset = null, params string[] properties)
+            where T : HubSpotCompany {
             EntityModel model = registry.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("companies/v2/companies/paged", GetListParameters(offset, properties).ToArray());
@@ -163,14 +155,12 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <param name="offset">offset to use to get a specific result page (optional)</param>
         /// <returns>a page of recently modified companies</returns>
         public async Task<PageResponse<T>> RecentlyModifiedPage<T>(long? offset = null)
-            where T : HubSpotCompany
-        {
+            where T : HubSpotCompany {
             EntityModel model = registry.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("companies/v2/companies/recent/modified", GetListParameters(offset).ToArray());
 
-            return new PageResponse<T>
-            {
+            return new PageResponse<T> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
             };
@@ -183,14 +173,12 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <param name="offset">offset to use to get a specific result page (optional)</param>
         /// <returns>a page of recently created companies</returns>
         public async Task<PageResponse<T>> RecentlyCreatedPage<T>(long? offset = null)
-            where T : HubSpotCompany
-        {
+            where T : HubSpotCompany {
             EntityModel model = registry.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("companies/v2/companies/recent/created", GetListParameters(offset).ToArray());
 
-            return new PageResponse<T>
-            {
+            return new PageResponse<T> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
             };
@@ -205,8 +193,7 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <param name="properties">properties to include in search result</param>
         /// <returns>a page of recently created companies</returns>
         public async Task<PageResponse<T>> SearchByDomainPage<T>(string domain, long? offset = null, params string[] properties)
-            where T : HubSpotCompany
-        {
+            where T : HubSpotCompany {
             EntityModel model = registry.Get(typeof(T));
 
             JObject request = new JObject {
@@ -220,8 +207,7 @@ namespace Vertical.HubSpot.Api.Companies {
             };
             JObject response = await rest.Post<JObject>($"companies/v2/domains/{domain}/companies", request);
 
-            return new PageResponse<T>
-            {
+            return new PageResponse<T> {
                 Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
             };
@@ -235,12 +221,12 @@ namespace Vertical.HubSpot.Api.Companies {
         /// <returns>list of all companies</returns>
         public async Task<T[]> List<T>(params string[] properties)
             where T : HubSpotCompany {
-            List<T> result=new List<T>();
+            List<T> result = new List<T>();
             PageResponse<T> response = null;
             do {
                 response = await ListPage<T>(response?.Offset, properties);
                 result.AddRange(response.Data);
-            } while (response.Offset.HasValue);
+            } while(response.Offset.HasValue);
 
             return result.ToArray();
         }

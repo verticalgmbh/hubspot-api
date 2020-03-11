@@ -29,7 +29,7 @@ namespace Vertical.HubSpot.Api.Contacts {
         {
             yield return new Parameter("limit", "100");
             if (offset.HasValue)
-                yield return new Parameter("offset", offset.ToString());
+                yield return new Parameter("vidOffset", offset.ToString());
             foreach (string property in properties)
                 yield return new Parameter("properties", property);
         }
@@ -120,8 +120,23 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <param name="id">id of contact to return</param>
         /// <returns>contact data</returns>
         public async Task<T> Get<T>(long id)
-            where T : HubSpotContact {
+            where T : HubSpotContact
+        {
             JObject response = await rest.Get<JObject>($"contacts/v1/contact/vid/{id}/profile");
+            EntityModel model = models.Get(typeof(T));
+            return response.ToContact<T>(model);
+        }
+
+        /// <summary>
+        /// get a contact by email
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="email">email of contact to return</param>
+        /// <returns>contact data</returns>
+        public async Task<T> Get<T>(string email)
+            where T : HubSpotContact
+        {
+            JObject response = await rest.Get<JObject>($"contacts/v1/contact/email/{email}/profile");
             EntityModel model = models.Get(typeof(T));
             return response.ToContact<T>(model);
         }

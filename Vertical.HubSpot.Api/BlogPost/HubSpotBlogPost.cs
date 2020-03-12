@@ -144,5 +144,15 @@ namespace Vertical.HubSpot.Api.BlogPost
 
         [JsonProperty("blog_author")]
         public HubSpotBlogAuthor BlogAuthor { get; set; }
+
+        [JsonProperty("featured_image")]
+        public string FeaturedImage { get; set; }
+
+        [JsonProperty("html_title")]
+        public string HtmlTitle { get; set; }
+
+        [JsonProperty("published_url")]
+        public string PublishedUrl { get; set; }
+
     }
 }

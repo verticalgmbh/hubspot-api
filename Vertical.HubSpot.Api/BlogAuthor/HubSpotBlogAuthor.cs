@@ -1,58 +1,62 @@
-﻿using Vertical.HubSpot.Api.Data;
+﻿using Newtonsoft.Json;
+using Vertical.HubSpot.Api.Data;
 
 namespace Vertical.HubSpot.Api.BlogAuthor
 {
     public class HubSpotBlogAuthor
 	{
-        [Name("avatar")]
+        [JsonProperty("avatar")]
         public string Avatar { get; set; }
 
-        [Name("bio")]
+        [JsonProperty("gravatar_url")]
+        public string GravatarUrl { get; set; }
+
+        [JsonProperty("bio")]
         public string Bio { get; set; }
         
-        [Name("created")]
+        [JsonProperty("created")]
         public long Created { get; set; }
         
-        [Name("deleted_at")]
+        [JsonProperty("deleted_at")]
         public long DeletedAt { get; set; }
 
-        [Name("display_name")]
+        [JsonProperty("display_name")]
         public string DisplayName { get; set; }
 
-        [Name("email")]
+        [JsonProperty("email")]
         public string Email { get; set; }
 
-        [Name("facebook")]
+        [JsonProperty("facebook")]
         public string Facebook { get; set; }
 
-        [Name("full_name")]
+        [JsonProperty("full_name")]
         public string FullName { get; set; }
 
-        [Name("has_social_profiles")]
+        [JsonProperty("has_social_profiles")]
         public bool HasSocialProfiles { get; set; }
 
-        [Name("id")]
+        [JsonProperty("id")]
         public long Id { get; set; }
 
-        [Name("linkedin")]
+        [JsonProperty("linkedin")]
         public string Linkedin { get; set; }
 
-        [Name("portal_id")]
+        [JsonProperty("portal_id")]
         public long PortalId { get; set; }
 
-        [Name("slug")]
+        [JsonProperty("slug")]
         public string Slug { get; set; }
 
-        [Name("twitter")]
+        [JsonProperty("twitter")]
         public string Twitter { get; set; }
 
-        [Name("twitter_username")]
+        [JsonProperty("twitter_username")]
         public string TwitterUsername { get; set; }
 
-        [Name("updated")]
+        [JsonProperty("updated")]
         public long Updated { get; set; }
 
-        [Name("website")]
+        [JsonProperty("website")]
         public string Website { get; set; }
     }
 }

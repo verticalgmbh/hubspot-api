@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Vertical.HubSpot.Api;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.UnitTest.Test;
@@ -33,9 +34,15 @@ namespace Vertical.HubSpot.UnitTest.Contacts
             _outputHelper = outputHelper;
         }
 
-        protected Api.HubSpot GetHubSpot()
+        protected Api.HubSpot GetHubSpot(HubSpotOptions options = null)
         {
-            return new Api.HubSpot(Configuration["Hubspot:ApiKey"]);
+            var apiKey = Configuration["Hubspot:ApiKey"];
+            if (options != null)
+            {
+                options.ApiKey = apiKey;
+                return new Api.HubSpot(options);
+            }
+            return new Api.HubSpot(apiKey);
         }
 
         [Fact]
@@ -64,7 +71,9 @@ namespace Vertical.HubSpot.UnitTest.Contacts
         {
             var contact = await FindContact("donald.duck@disney.com");
 
-            var hubspot = GetHubSpot();
+            var options = new HubSpotOptions();
+            options.Contact.IgnorePropertiesWithNullValues = true;
+            var hubspot = GetHubSpot(options);
             await hubspot.Contacts.CreateOrUpdate("donald.duck@disney.com", new TestHubSpotContact
             {
                 ID = contact.ID,

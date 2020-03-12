@@ -15,6 +15,15 @@ namespace Vertical.HubSpot.Api {
     /// https://developers.hubspot.com/docs/overview
     /// </remarks>
     public class HubSpot : IHubSpot {
+        /// <summary>
+        /// creates a new <see cref="HubSpot"/>
+        /// </summary>
+        /// <remarks>this connects to the default endpoint hubspot provides</remarks>
+        /// <param name="apikey">key used to access api</param>
+        public HubSpot(HubSpotOptions options)
+            : this(new HubSpotRestClient(options.ApiKey, new Uri(options.ApiUrl)), options)
+        {
+        }
 
         /// <summary>
         /// creates a new <see cref="HubSpot"/>
@@ -40,14 +49,16 @@ namespace Vertical.HubSpot.Api {
         /// creates a new <see cref="HubSpot"/>
         /// </summary>
         /// <param name="restclient">rest client used to access hubspot</param>
-        public HubSpot(HubSpotRestClient restclient)
+        /// <param name="options">options for hubspot api</param>
+        public HubSpot(HubSpotRestClient restclient, HubSpotOptions options = null)
         {
+            options = options ?? new HubSpotOptions();
             ModelRegistry registry = new ModelRegistry();
-            Contacts = new ContactApi(restclient, registry);
+            Contacts = new ContactApi(options, restclient, registry);
             Companies = new CompanyApi(restclient, registry);
             Associations = new AssociationApi(restclient);
             Deals = new DealsApi(restclient, registry);
-            Tickets=new TicketsApi(restclient, registry);
+            Tickets = new TicketsApi(restclient, registry);
         }
 
         /// <summary>

@@ -22,6 +22,5 @@ namespace Vertical.HubSpot.Api.Contacts
         /// </summary>
         [IgnoreDataMember]
         public bool Deleted { get; set; }
-
     }
 }

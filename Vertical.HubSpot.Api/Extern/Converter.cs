@@ -2,10 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 #if WINDOWS_UWP
 using System.Reflection;
@@ -50,6 +52,8 @@ namespace NightlyCode.Core.Conversion
             specificconverters[new ConversionKey(typeof(string), typeof(bool))] = v => (string)v != "" && (string)v != "0" && ((string)v).ToLower() != "false";
             specificconverters[new ConversionKey(typeof(string), typeof(byte[]))] = v => System.Convert.FromBase64String((string)v);
             specificconverters[new ConversionKey(typeof(string), typeof(Color))] = ParseColor;
+            specificconverters[new ConversionKey(typeof(JArray), typeof(Dictionary<string,string>))] = o=> ((JArray)o).ToDictionary(k => ((JObject)k).Properties().First().Name, v => v.Values().First().Value<string>());
+            specificconverters[new ConversionKey(typeof(JArray), typeof(List<long>))] = o=> ((JArray)o).Select(l => l.Value<long>()).ToList();
         }
 
         static int ParseColorValue(string value)

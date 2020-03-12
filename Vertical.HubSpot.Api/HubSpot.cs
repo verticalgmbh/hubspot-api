@@ -1,5 +1,6 @@
 ﻿using System;
 using Vertical.HubSpot.Api.Associations;
+using Vertical.HubSpot.Api.BlogPost;
 using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Deals;
@@ -59,6 +60,7 @@ namespace Vertical.HubSpot.Api {
             Associations = new AssociationApi(restclient);
             Deals = new DealsApi(restclient, registry);
             Tickets = new TicketsApi(restclient, registry);
+            BlogPosts = new BlogPostApi(restclient, registry);
         }
 
         /// <summary>
@@ -69,12 +71,13 @@ namespace Vertical.HubSpot.Api {
         /// <param name="associations">associations api to use</param>
         /// <param name="deals">deals api to use</param>
         /// <param name="tickets">tickets api to use</param>
-        public HubSpot(IContactApi contacts, ICompanyApi companies, IAssociationApi associations, IDealsApi deals, ITicketsApi tickets) {
+        public HubSpot(IContactApi contacts, ICompanyApi companies, IAssociationApi associations, IDealsApi deals, ITicketsApi tickets, IBlogPostApi blogposts ) {
             Contacts = contacts;
             Companies = companies;
             Associations = associations;
             Deals = deals;
             Tickets = tickets;
+            BlogPosts = blogposts;
         }
 
         /// <summary>
@@ -99,5 +102,7 @@ namespace Vertical.HubSpot.Api {
 
         /// <inheritdoc />
         public ITicketsApi Tickets { get; }
+
+        public IBlogPostApi BlogPosts { get; }
     }
 }

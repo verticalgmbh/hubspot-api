@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Vertical.HubSpot.UnitTest.Test
+namespace Vertical.HubSpot.Test.Test
 {
     public class TestBase
     {

@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Vertical.HubSpot.Api;
+using Vertical.HubSpot.Api.Contacts;
+using Vertical.HubSpot.Test.Contacts;
+using Xunit;
 
 namespace Vertical.HubSpot.Test.Test
 {
@@ -12,6 +17,18 @@ namespace Vertical.HubSpot.Test.Test
                 .AddUserSecrets<TestBase>();
 
             Configuration = builder.Build();
+        }
+
+        protected Api.HubSpot GetHubSpot()
+        {
+            return new Api.HubSpot(new HubSpotOptions
+            {
+                ApiKey = Configuration["Hubspot:ApiKey"],
+                Contact = new HubSpotContactOptions()
+                {
+                    IgnorePropertiesWithNullValues = true
+                }
+            });
         }
     }
 }

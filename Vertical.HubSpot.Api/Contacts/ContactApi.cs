@@ -83,7 +83,16 @@ namespace Vertical.HubSpot.Api.Contacts {
             EntityModel model = models.Get(typeof(T));
 
             JObject request = new JObject();
-            request["properties"] = GetProperties(contact, model);
+            JArray properties = new JArray();
+            foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
+            {
+                properties.Add(new JObject
+                {
+                    ["property"] = property.Key,
+                    ["value"] = new JValue(property.Value.GetValue(contact))
+                });
+            }
+            request["properties"] = properties;
 
             await rest.Post<JObject>($"contacts/v1/contact/vid/{contact.ID}/profile", request);
         }

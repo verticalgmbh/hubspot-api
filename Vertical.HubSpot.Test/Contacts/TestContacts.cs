@@ -114,7 +114,7 @@ namespace Vertical.HubSpot.Test.Contacts
             bool hasMore;
             do
             {
-                var response = await hubspot.Contacts.ListPage<TestHubSpotContact>(offset,2);
+                var response = await hubspot.Contacts.ListPage<TestHubSpotContact>(offset,19, nameof(TestHubSpotContact.Email));
                 offset = response.Offset;
                 hasMore = response.HasMore ?? false;
             } while (hasMore);

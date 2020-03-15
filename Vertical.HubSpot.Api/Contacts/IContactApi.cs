@@ -39,7 +39,7 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <param name="offset">page offset</param>
         /// <param name="properties">properties to include in response</param>
         /// <returns>a page of contacts</returns>
-        Task<PageResponse<T>> ListPage<T>(long? offset = null, int? limit = null, params string[] properties)
+        Task<PageResponse<T>> ListPage<T>(long? offset = null, int? count = null, params string[] properties)
             where T:HubSpotContact;
 
         /// <summary>

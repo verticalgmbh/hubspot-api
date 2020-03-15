@@ -1,13 +1,14 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Vertical.HubSpot.Api;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Data;
-using Vertical.HubSpot.Test.Test;
+using Vertical.HubSpot.UnitTest.Test;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Vertical.HubSpot.Test.Contacts
+namespace Vertical.HubSpot.UnitTest.Contacts
 {
     public class TestContacts : TestBase
     {
@@ -27,45 +28,28 @@ namespace Vertical.HubSpot.Test.Contacts
         }
 
         private readonly ITestOutputHelper _outputHelper;
-        public const string HubSpotTestContact_Email = "donald.duck@disney.com";
-        public const long HubSpotTestContact_Id = 1149651;
 
         public TestContacts(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
         }
 
-        protected Api.HubSpot GetHubSpot()
+        protected Api.HubSpot GetHubSpot(HubSpotOptions options = null)
         {
-            return new Api.HubSpot(new HubSpotOptions
+            var apiKey = Configuration["Hubspot:ApiKey"];
+            if (options != null)
             {
-                ApiKey = Configuration["Hubspot:ApiKey"],
-                Contact = new HubSpotContactOptions()
-                {
-                    IgnorePropertiesWithNullValues = true
-                }
-            });
-        }
-
-        // private async Task<TestHubSpotContact> FindContact(Api.HubSpot hubspot, string email)
-        // {
-        //     var contact = await hubspot.Contacts.Get<TestHubSpotContact>(email);
-        //     Assert.True(contact != null, $"Contact with email {email} not found");
-        //     return contact;
-        // }
-
-        private async Task<TestHubSpotContact> FindContact(Api.HubSpot hubspot, long id)
-        {
-            var contact = await hubspot.Contacts.Get<TestHubSpotContact>(id);
-            Assert.True(contact != null, $"Contact with id {id} not found");
-            return contact;
+                options.ApiKey = apiKey;
+                return new Api.HubSpot(options);
+            }
+            return new Api.HubSpot(apiKey);
         }
 
         [Fact]
         public async Task CreateContact()
         {
             var hubspot = GetHubSpot();
-            var contactId = await hubspot.Contacts.CreateOrUpdate(HubSpotTestContact_Email, new TestHubSpotContact
+            var contactId = await hubspot.Contacts.CreateOrUpdate("donald.duck@disney.com", new TestHubSpotContact
             {
                 FirstName = "Donald",
                 LastName = "Duck",
@@ -74,13 +58,23 @@ namespace Vertical.HubSpot.Test.Contacts
             _outputHelper.WriteLine($"CreateContact: id={contactId}");
         }
 
+        private async Task<TestHubSpotContact> FindContact(string email)
+        {
+            var hubspot = new Api.HubSpot(Configuration["Hubspot:ApiKey"]);
+            var contact = await hubspot.Contacts.Get<TestHubSpotContact>(email);
+            Assert.True(contact != null, "Contact not found");
+            return contact;
+        }
+
         [Fact]
         public async Task UpdateContact()
         {
-            var hubspot = GetHubSpot();
-            var contact = await FindContact(hubspot, HubSpotTestContact_Id);
+            var contact = await FindContact("donald.duck@disney.com");
 
-            await hubspot.Contacts.CreateOrUpdate(HubSpotTestContact_Email, new TestHubSpotContact
+            var options = new HubSpotOptions();
+            options.Contact.IgnorePropertiesWithNullValues = true;
+            var hubspot = GetHubSpot(options);
+            await hubspot.Contacts.CreateOrUpdate("donald.duck@disney.com", new TestHubSpotContact
             {
                 ID = contact.ID,
                 FirstName = "Donald2",
@@ -94,10 +88,10 @@ namespace Vertical.HubSpot.Test.Contacts
         [Fact]
         public async Task DeleteContact()
         {
-            var hubspot = GetHubSpot();
-            var contact = await FindContact(hubspot, HubSpotTestContact_Id);
+            var contact = await FindContact("donald.duck@disney.com");
             Assert.NotNull(contact);
 
+            var hubspot = GetHubSpot();
             await hubspot.Contacts.Delete(contact.ID);
             _outputHelper.WriteLine($"DeleteContact: id={contact.ID}");
 

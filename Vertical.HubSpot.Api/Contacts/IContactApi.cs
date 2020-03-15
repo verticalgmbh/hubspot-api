@@ -50,5 +50,14 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <returns>contact data</returns>
         Task<T> Get<T>(long id)
             where T : HubSpotContact;
+
+        /// <summary>
+        /// get a contact by email
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="email">email of contact to return</param>
+        /// <returns>contact data</returns>
+        Task<T> Get<T>(string email)
+            where T : HubSpotContact;
     }
 }

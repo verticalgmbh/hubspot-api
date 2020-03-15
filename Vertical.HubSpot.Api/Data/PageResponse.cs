@@ -15,5 +15,8 @@
         /// offset to use to get next page if more data is available
         /// </summary>
         public long? Offset { get; set; }
+
+        [Name("has-more")]
+        public bool? HasMore { get; set; }
     }
 }

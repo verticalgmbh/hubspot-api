@@ -27,13 +27,13 @@ namespace Vertical.HubSpot.Api.Contacts {
             this.models = models;
         }
 
-        IEnumerable<Parameter> GetListParameters(long? offset, params string[] properties)
+        IEnumerable<Parameter> GetListParameters(long? offset, int? count, params string[] properties)
         {
-            yield return new Parameter("limit", "100");
+            yield return new Parameter("count", (count ?? 20).ToString());
             if (offset.HasValue)
                 yield return new Parameter("vidOffset", offset.ToString());
             foreach (string property in properties)
-                yield return new Parameter("properties", property);
+                yield return new Parameter("property", property);
         }
 
         private JArray GetProperties<T>(T contact, EntityModel model)
@@ -103,16 +103,18 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <param name="offset">page offset</param>
         /// <param name="properties">properties to include in response</param>
         /// <returns>a page of contacts</returns>
-        public async Task<PageResponse<T>> ListPage<T>(long? offset = null, params string[] properties)
+        public async Task<PageResponse<T>> ListPage<T>(long? offset = null, int? count = null, params string[] properties)
             where T:HubSpotContact
         {
             EntityModel model = models.Get(typeof(T));
 
-            JObject response = await rest.Get<JObject>("contacts/v1/lists/all/contacts/all", GetListParameters(offset, properties).ToArray());
+            JObject response = await rest.Get<JObject>("contacts/v1/lists/all/contacts/all", GetListParameters(offset, count ?? 100, properties).ToArray());
 
+            var hasMore = response.Value<bool>("has-more");
             return new PageResponse<T>
             {
-                Offset = response.Value<bool>("has-more") ? response.Value<long?>("vid-offset") : null,
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("vid-offset") : null,
                 Data = response.GetValue("contacts").OfType<JObject>().Select(d => d.ToContact<T>(model)).ToArray()
             };
         }

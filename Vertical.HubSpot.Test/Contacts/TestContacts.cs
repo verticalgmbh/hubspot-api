@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Vertical.HubSpot.Api;
 using Vertical.HubSpot.Api.Contacts;
@@ -89,6 +90,22 @@ namespace Vertical.HubSpot.Test.Contacts
             await hubspot.Contacts.Delete(contact.ID);
             _outputHelper.WriteLine($"DeleteContact: id={contact.ID}");
 
+        }
+
+        [Fact]
+        public async Task ListContacts()
+        {
+            var hubspot = GetHubSpot();
+
+            // two pages...
+            long? offset = null;
+            bool hasMore;
+            do
+            {
+                var response = await hubspot.Contacts.ListPage<TestHubSpotContact>(offset,19, nameof(TestHubSpotContact.Email));
+                offset = response.Offset;
+                hasMore = response.HasMore ?? false;
+            } while (hasMore);
         }
 
     }

@@ -19,6 +19,15 @@ namespace Vertical.HubSpot.Api.Contacts {
             where T : HubSpotContact;
 
         /// <summary>
+        /// creates or updates a contact, without email
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="contact">contact data to create or update</param>
+        /// <returns></returns>
+        Task<long> CreateOrUpdate<T>(T contact)
+            where T : HubSpotContact;
+
+        /// <summary>
         /// updates a contact
         /// </summary>
         /// <typeparam name="T">type of contact model</typeparam>

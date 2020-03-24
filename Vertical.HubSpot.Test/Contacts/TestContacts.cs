@@ -35,18 +35,6 @@ namespace Vertical.HubSpot.Test.Contacts
             _outputHelper = outputHelper;
         }
 
-        protected Api.HubSpot GetHubSpot()
-        {
-            return new Api.HubSpot(new HubSpotOptions
-            {
-                ApiKey = Configuration["Hubspot:ApiKey"],
-                Contact = new HubSpotContactOptions()
-                {
-                    IgnorePropertiesWithNullValues = true
-                }
-            });
-        }
-
         // private async Task<TestHubSpotContact> FindContact(Api.HubSpot hubspot, string email)
         // {
         //     var contact = await hubspot.Contacts.Get<TestHubSpotContact>(email);

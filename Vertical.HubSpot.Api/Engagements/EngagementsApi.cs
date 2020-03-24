@@ -44,10 +44,9 @@ namespace Vertical.HubSpot.Api.Engagements
             return ToEngagementResult<T>(response);
         }
 
-        public async Task<JObject> DeleteEngagement(long id)
+        public Task<JObject> DeleteEngagement(long id)
         {
-            JObject response = await rest.Delete<JObject>($"/engagements/v1/engagements/{id}");
-            return response;
+            return rest.Delete<JObject>($"/engagements/v1/engagements/{id}");
         }
 
         public async Task<T> CreateEngagement<T>(HubSpotEngagementResult data)

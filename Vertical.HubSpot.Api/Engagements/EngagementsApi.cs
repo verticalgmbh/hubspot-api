@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Vertical.HubSpot.Api.Data;
-using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
 
 namespace Vertical.HubSpot.Api.Engagements

@@ -7,6 +7,9 @@ namespace Vertical.HubSpot.Api.Models {
     /// <summary>
     /// model for an entity
     /// </summary>
+#if DEBUG
+    public
+#endif
     class EntityModel {
         readonly Dictionary<string, PropertyInfo> propertymapping=new Dictionary<string, PropertyInfo>();
         readonly Dictionary<string, string> namemapping = new Dictionary<string, string>();

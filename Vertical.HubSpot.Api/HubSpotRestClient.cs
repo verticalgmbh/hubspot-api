@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Extensions;
 using Newtonsoft.Json.Linq;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Logging;
@@ -71,6 +72,26 @@ namespace Vertical.HubSpot.Api {
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
 
             HttpResponseMessage response = await client.PostAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
+            using (response) {
+                await CheckForError(request, response);
+                return await ReadResponse<T>(response);
+            }
+        }
+
+        /// <summary>
+        /// Sends a patch request to hubspot
+        /// </summary>
+        /// <param name="url">url to post the request to</param>
+        /// <param name="request">request data</param>
+        /// <param name="parameters">additional query parameters</param>
+        /// <returns>response data</returns>
+        public async Task<T> Patch<T>(string url, JToken request, params Parameter[] parameters)
+            where T : JToken {
+            url += $"?hapikey={apikey}";
+            if (parameters.Length > 0)
+                url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
+
+            HttpResponseMessage response = await client.PatchAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
             using (response) {
                 await CheckForError(request, response);
                 return await ReadResponse<T>(response);

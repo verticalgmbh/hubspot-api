@@ -73,6 +73,26 @@ namespace Vertical.HubSpot.Api.Contacts {
         }
 
         /// <summary>
+        /// creates or updates a contact
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="email">e-mail of contact to create or update</param>
+        /// <param name="contact">contact data to create or update</param>
+        /// <returns></returns>
+        public async Task<long> CreateOrUpdate<T>(T contact)
+            where T : HubSpotContact
+        {
+            EntityModel model = models.Get(typeof(T));
+
+            JObject request = new JObject();
+            request["properties"] = GetProperties(contact, model);
+
+            JObject response = await rest.Post<JObject>($"contacts/v1/contact", request);
+            return response.Value<long>("vid");
+        }
+
+
+        /// <summary>
         /// updates a contact
         /// </summary>
         /// <typeparam name="T">type of contact model</typeparam>

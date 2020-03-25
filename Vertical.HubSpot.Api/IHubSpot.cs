@@ -2,6 +2,7 @@
 using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Deals;
+using Vertical.HubSpot.Api.Engagements;
 using Vertical.HubSpot.Api.Tickets;
 
 namespace Vertical.HubSpot.Api {
@@ -34,5 +35,10 @@ namespace Vertical.HubSpot.Api {
         /// access to ticket information
         /// </summary>
         ITicketsApi Tickets { get; }
+
+        /// <summary>
+        /// access to engagements
+        /// </summary>
+        IEngagementsApi Engagements { get; }
     }
 }

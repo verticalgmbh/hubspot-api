@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NightlyCode.Core.Conversion;
+using Vertical.HubSpot.Api.BlogPost;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Models;
@@ -64,6 +65,29 @@ namespace Vertical.HubSpot.Api.Extensions
                 if (objectproperty == null)
                     continue;
                 objectproperty.SetValue(result, Converter.Convert(property.Value.Value<object>("value"), objectproperty.PropertyType));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// converts a json response to a <see cref="HubSpotBlogPost"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="blogpost">json containing contact data</param>
+        /// <param name="model">model for contact entity</param>
+        /// <returns></returns>
+        public static T ToBlogPost<T>(this JObject blogpost, EntityModel model) where T : HubSpotBlogPost
+        {
+            T result = Activator.CreateInstance<T>();
+
+//            JObject responseproperties = (JObject)blogpost["properties"];
+            foreach (KeyValuePair<string, JToken> property in blogpost)
+            {
+                PropertyInfo objectproperty = model.GetProperty(property.Key);
+                if (objectproperty == null)
+                    continue;
+                objectproperty.SetValue(result, Converter.Convert(property.Value.Value<object>(), objectproperty.PropertyType));
             }
 
             return result;

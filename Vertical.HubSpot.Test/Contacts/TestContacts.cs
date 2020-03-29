@@ -142,5 +142,21 @@ namespace Vertical.HubSpot.Test.Contacts
             } while (hasMore);
         }
 
+        [Fact]
+        public async Task MergeContacts()
+        {
+            var hubspot = GetHubSpot();
+
+            var mergeFromContactId = 42;
+            var mergeIntoContactId = 43;
+
+            var exception = await Assert.ThrowsAsync<HubSpotException>( async () =>
+            {
+                await hubspot.Contacts.Merge(mergeIntoContactId, mergeFromContactId);
+            });
+
+            Assert.Contains("canonical vid is not a valid contact or is already in the process of being merged", exception.Message);
+        }
+
     }
 }

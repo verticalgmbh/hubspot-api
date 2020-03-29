@@ -68,5 +68,14 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <returns>contact data</returns>
         Task<T> Get<T>(string email)
             where T : HubSpotContact;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mergeIntoContactId">The contact id where data will be merge into</param>
+        /// <param name="mergeFromContactId">The contact id where data will be merged from</param>
+        /// <returns></returns>
+        /// <remarks>mergeFromContactId is gone after merge, NO undo is possible!</remarks>
+        Task Merge(long mergeIntoContactId, long mergeFromContactId);
     }
 }

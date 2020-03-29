@@ -166,5 +166,12 @@ namespace Vertical.HubSpot.Api.Contacts {
             EntityModel model = models.Get(typeof(T));
             return response.ToContact<T>(model);
         }
+
+        public Task Merge(long mergeIntoContactId, long mergeFromContactId)
+        {
+            JObject request = new JObject();
+            request["vidToMerge"] = mergeFromContactId;
+            return rest.Post($"/contacts/v1/contact/merge-vids/{mergeIntoContactId}/",request);
+        }
     }
 }

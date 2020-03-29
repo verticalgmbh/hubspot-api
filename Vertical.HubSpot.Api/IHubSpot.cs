@@ -1,4 +1,5 @@
 ﻿using Vertical.HubSpot.Api.Associations;
+using Vertical.HubSpot.Api.BlogPost;
 using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Deals;
@@ -30,6 +31,11 @@ namespace Vertical.HubSpot.Api {
         /// access to deals
         /// </summary>
         IDealsApi Deals { get; }
+
+        /// <summary>
+        /// access to blog posts
+        /// </summary>
+        IBlogPostApi BlogPosts { get; }
 
         /// <summary>
         /// access to ticket information

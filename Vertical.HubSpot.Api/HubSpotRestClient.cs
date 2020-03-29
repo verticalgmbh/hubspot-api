@@ -79,6 +79,25 @@ namespace Vertical.HubSpot.Api {
         }
 
         /// <summary>
+        /// posts a request to hubspot
+        /// </summary>
+        /// <param name="url">url to post the request to</param>
+        /// <param name="request">request data</param>
+        /// <param name="parameters">additional query parameters</param>
+        public async Task Post(string url, JToken request, params Parameter[] parameters)
+        {
+            url += $"?hapikey={apikey}";
+            if (parameters.Length > 0)
+                url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
+
+            HttpResponseMessage response = await client.PostAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
+            using (response)
+            {
+                await CheckForError(request, response);
+            }
+        }
+
+        /// <summary>
         /// Sends a patch request to hubspot
         /// </summary>
         /// <param name="url">url to post the request to</param>

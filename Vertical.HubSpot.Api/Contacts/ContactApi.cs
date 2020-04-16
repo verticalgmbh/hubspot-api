@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -129,6 +130,50 @@ namespace Vertical.HubSpot.Api.Contacts {
             EntityModel model = models.Get(typeof(T));
 
             JObject response = await rest.Get<JObject>("contacts/v1/lists/all/contacts/all", GetListParameters(offset, count ?? 100, properties).ToArray());
+
+            var hasMore = response.Value<bool>("has-more");
+            return new PageResponse<T>
+            {
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("vid-offset") : null,
+                Data = response.GetValue("contacts").OfType<JObject>().Select(d => d.ToContact<T>(model)).ToArray()
+            };
+        }
+
+        /// <summary>
+        /// get recently modified contacts
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <returns>a page of recently modified contacts</returns>
+        public async Task<PageResponse<T>> RecentlyUpdatedPage<T>(long? offset = null, int? count = null, params string[] properties)
+            where T : HubSpotContact
+        {
+            EntityModel model = models.Get(typeof(T));
+
+            JObject response = await rest.Get<JObject>("contacts/v1/lists/recently_updated/contacts/recent", GetListParameters(offset, count ?? 100, properties).ToArray());
+
+            var hasMore = response.Value<bool>("has-more");
+            return new PageResponse<T>
+            {
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("vid-offset") : null,
+                Data = response.GetValue("results").OfType<JObject>().Select(d => d.ToContact<T>(model)).ToArray()
+            };
+        }
+
+        /// <summary>
+        /// get recently created contacts
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <returns>a page of recently created contacts</returns>
+        public async Task<PageResponse<T>> RecentlyCreatedPage<T>(long? offset = null, int? count = null, params string[] properties)
+            where T : HubSpotContact
+        {
+            EntityModel model = models.Get(typeof(T));
+
+            JObject response = await rest.Get<JObject>("contacts/v1/lists/all/contacts/recent", GetListParameters(offset, count ?? 100, properties).ToArray());
 
             var hasMore = response.Value<bool>("has-more");
             return new PageResponse<T>

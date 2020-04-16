@@ -52,6 +52,24 @@ namespace Vertical.HubSpot.Api.Contacts {
             where T:HubSpotContact;
 
         /// <summary>
+        /// get recently modified contacts
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <returns>a page of recently modified contacts</returns>
+        Task<PageResponse<T>> RecentlyUpdatedPage<T>(long? offset = null, int? count = null, params string[] properties)
+            where T : HubSpotContact;
+
+        /// <summary>
+        /// get recently created contacts
+        /// </summary>
+        /// <typeparam name="T">type of contact model</typeparam>
+        /// <param name="offset">offset to use to get a specific result page (optional)</param>
+        /// <returns>a page of recently created contacts</returns>
+        Task<PageResponse<T>> RecentlyCreatedPage<T>(long? offset = null, int? count = null, params string[] properties)
+            where T : HubSpotContact;
+
+        /// <summary>
         /// get a contact by id
         /// </summary>
         /// <typeparam name="T">type of contact model</typeparam>

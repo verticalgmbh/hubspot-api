@@ -20,7 +20,6 @@ Global
 		{651286E9-6DB5-440B-BD86-F5E8BB7777CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{651286E9-6DB5-440B-BD86-F5E8BB7777CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651286E9-6DB5-440B-BD86-F5E8BB7777CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{651286E9-6DB5-440B-BD86-F5E8BB7777CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

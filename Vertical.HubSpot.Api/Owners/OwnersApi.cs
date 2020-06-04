@@ -12,7 +12,7 @@ namespace Vertical.HubSpot.Api.Owners
     /// <summary>
     /// api for owners in hubspot
     /// </summary>
-    public class OwnersApi : IOwnersApi
+    class OwnersApi : IOwnersApi
     {
         readonly HubSpotRestClient rest;
         readonly ModelRegistry models;

@@ -7,6 +7,7 @@ using Vertical.HubSpot.Api.BlogPost;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Models;
+using Vertical.HubSpot.Api.Owners;
 
 namespace Vertical.HubSpot.Api.Extensions
 {
@@ -38,6 +39,31 @@ namespace Vertical.HubSpot.Api.Extensions
                     continue;
                 objectproperty.SetValue(result, Converter.Convert(property.Value.Value<object>("value"), objectproperty.PropertyType));
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// converts a json response to a <see cref="HubSpotOwner"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="owner">json containing owner data</param>
+        /// <param name="model">model for owner entity</param>
+        /// <returns></returns>
+        public static T ToOwner<T>(this JObject owner)
+            where T : HubSpotOwner
+        {
+            T result = Activator.CreateInstance<T>();
+            result.OwnerId = owner.Value<long>("ownerId");
+            result.PortalId = owner.Value<long>("portalId");
+            result.Type = owner.Value<string>("type");
+            result.FirstName = owner.Value<string>("firstName");
+            result.LastName = owner.Value<string>("lastName");
+            result.Email = owner.Value<string>("email");
+
+            // todo deserialise remoteentry
+            result.CreatedAt = (DateTime)Converter.Convert(owner["createdAt"], typeof(DateTime));
+            result.UpdatedAt = (DateTime)Converter.Convert(owner["updatedAt"], typeof(DateTime));
 
             return result;
         }

@@ -5,7 +5,8 @@ namespace Vertical.HubSpot.Api.Owners {
     /// <summary>
     /// owner in hubspot
     /// </summary>
-    public class Owner {
+    public class HubSpotOwner
+    {
 
         /// <summary>
         /// id of portal owner is registered to
@@ -35,7 +36,7 @@ namespace Vertical.HubSpot.Api.Owners {
         /// <summary>
         /// owner email
         /// </summary>
-        public string EMail { get; set; }
+        public string Email { get; set; }
 
         /// <summary>
         /// time when owner was created

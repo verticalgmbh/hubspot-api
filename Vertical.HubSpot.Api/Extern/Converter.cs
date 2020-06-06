@@ -35,6 +35,12 @@ namespace NightlyCode.Core.Conversion
             specificconverters[new ConversionKey(typeof(TimeSpan), typeof(long))] = v => ((TimeSpan)v).Ticks;
             specificconverters[new ConversionKey(typeof(string), typeof(Type))] = o => Type.GetType((string)o);
             specificconverters[new ConversionKey(typeof(long), typeof(DateTime))] = v => new DateTime((long)v);
+            specificconverters[new ConversionKey(typeof(JValue), typeof(bool))] = v => System.Convert.ToBoolean(((JValue)v).ToObject<Int16>());
+#if NETSTANDARD
+            specificconverters[new ConversionKey(typeof(JValue), typeof(DateTime))] = v => DateTimeOffset.FromUnixTimeSeconds(((JValue)v).ToObject<long>()/1000).DateTime;
+#else
+            specificconverters[new ConversionKey(typeof(JValue), typeof(DateTime))] = v => new DateTime(TimeSpan.FromSeconds(((JValue)v).ToObject<long>()/1000).Ticks).ToLocalTime();
+#endif
             specificconverters[new ConversionKey(typeof(DateTime), typeof(long))] = v => ((DateTime)v).Ticks;
             specificconverters[new ConversionKey(typeof(Version), typeof(string))] = o => o.ToString();
             specificconverters[new ConversionKey(typeof(string), typeof(Version))] = s => Version.Parse((string)s);

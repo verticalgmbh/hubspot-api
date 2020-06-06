@@ -23,19 +23,19 @@ namespace Vertical.HubSpot.Api.Deals {
         /// associated companies
         /// </summary>
         [IgnoreDataMember]
-        public long[] Companies { get; set; }
+        public long[] Companies { get; set; } = new long[] { };
 
         /// <summary>
         /// associated contacts
         /// </summary>
         [IgnoreDataMember]
-        public long[] Contacts { get; set; }
+        public long[] Contacts { get; set; } = new long[] { };
 
         /// <summary>
         /// associated deals
         /// </summary>
         [IgnoreDataMember]
-        public long[] Deals { get; set; }
+        public long[] Deals { get; set; } = new long[] { };
 
         /// <summary>
         /// stage of deal

@@ -164,7 +164,7 @@ namespace Vertical.HubSpot.Api.Deals {
 
             JObject response = await rest.Get<JObject>("deals/v1/deal/paged", GetListParameters(offset, properties).ToArray());
 
-            var hasMore = response.Value<bool>("has-more");
+            var hasMore = response.Value<bool>("hasMore");
             return new PageResponse<T> {
                 HasMore = hasMore,
                 Offset = hasMore ? response.Value<long?>("offset") : null,

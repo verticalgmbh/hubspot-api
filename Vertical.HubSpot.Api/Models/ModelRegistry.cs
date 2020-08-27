@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Vertical.HubSpot.Api.Data;
 
 namespace Vertical.HubSpot.Api.Models {
@@ -9,7 +12,13 @@ namespace Vertical.HubSpot.Api.Models {
     /// <summary>
     /// registry for models of entities
     /// </summary>
-    class ModelRegistry {
+#if DEBUG
+    public
+#endif
+    class ModelRegistry
+    {
+        private static readonly Type[] IgnoreAttributes = { typeof(IgnoreDataMemberAttribute), typeof(JsonIgnoreAttribute) };
+
         readonly Dictionary<Type, EntityModel> models=new Dictionary<Type, EntityModel>();
         readonly object modellock = new object();
 
@@ -24,12 +33,15 @@ namespace Vertical.HubSpot.Api.Models {
                 if (!models.TryGetValue(entitytype, out model)) {
                     model = new EntityModel();
                     foreach (PropertyInfo property in entitytype.GetProperties()) {
-                        if (Attribute.IsDefined(property, typeof(IgnoreDataMemberAttribute)))
+                        if(IgnoreAttributes.Any(t=> Attribute.IsDefined(property, t)) )
                             continue;
 
                         string mappingname = property.Name.ToLower();
                         if (Attribute.GetCustomAttribute(property, typeof(NameAttribute)) is NameAttribute name)
                             mappingname = name.Name;
+                        else if(Attribute.GetCustomAttribute(property, typeof(JsonPropertyAttribute)) is JsonPropertyAttribute jsonProperty)
+                            mappingname = jsonProperty.PropertyName;
+
                         model.AddProperty(property, mappingname);
                     }
 

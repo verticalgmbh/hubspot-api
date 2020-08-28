@@ -24,7 +24,7 @@ namespace Vertical.HubSpot.Api.Extensions
         public static IServiceCollection AddHubspot(this IServiceCollection services, HubSpotOptions options)
         {
             if (string.IsNullOrWhiteSpace(options?.ApiKey)) throw new ArgumentNullException(nameof(HubSpotOptions.ApiKey));
-            if (string.IsNullOrWhiteSpace(options?.ApiUrl)) throw new ArgumentNullException(nameof(HubSpotOptions.ApiUrl));
+            if (options?.ApiUrl==null) throw new ArgumentNullException(nameof(HubSpotOptions.ApiUrl));
 
             return services
                 .AddSingleton<IHubSpot, HubSpot>(provider => new HubSpot(options))

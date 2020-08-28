@@ -15,6 +15,7 @@ namespace Vertical.HubSpot.Api.Contacts
         /// </summary>
         [IgnoreDataMember]
         [Name("vid")]
+        [HubspotId]
         public long ID { get; set; }
 
         /// <summary>

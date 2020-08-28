@@ -1,0 +1,20 @@
+﻿{
+  "results": [
+    {
+      "id": "174",
+      "properties": {
+        "firstname": "Brantley",
+        "lastname": "Forrest",
+        "email": "bforrest8@acme.com"
+      },
+      "createdAt": "2019-10-30T03:30:17.883Z",
+      "updatedAt": "2019-10-30T16:50:06.678Z",
+      "archived": false
+    }
+  ],
+  "paging": {
+    "next": {
+      "after": "10"
+    }
+  }
+}

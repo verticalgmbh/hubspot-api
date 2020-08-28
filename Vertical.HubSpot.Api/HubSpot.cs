@@ -5,6 +5,7 @@ using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Deals;
 using Vertical.HubSpot.Api.Engagements;
+using Vertical.HubSpot.Api.Http;
 using Vertical.HubSpot.Api.Models;
 using Vertical.HubSpot.Api.Tickets;
 
@@ -17,15 +18,6 @@ namespace Vertical.HubSpot.Api {
     /// https://developers.hubspot.com/docs/overview
     /// </remarks>
     public class HubSpot : IHubSpot {
-        /// <summary>
-        /// creates a new <see cref="HubSpot"/>
-        /// </summary>
-        /// <remarks>this connects to the default endpoint hubspot provides</remarks>
-        /// <param name="apikey">key used to access api</param>
-        public HubSpot(HubSpotOptions options)
-            : this(new HubSpotRestClient(options.ApiKey, new Uri(options.ApiUrl)), options)
-        {
-        }
 
         /// <summary>
         /// creates a new <see cref="HubSpot"/>
@@ -33,7 +25,7 @@ namespace Vertical.HubSpot.Api {
         /// <remarks>this connects to the default endpoint hubspot provides</remarks>
         /// <param name="apikey">key used to access api</param>
         public HubSpot(string apikey)
-            : this(new HubSpotRestClient(apikey, new Uri("https://api.hubapi.com/")))
+            : this(new HubSpotOptions(){ApiKey = apikey})
         {
         }
 
@@ -43,18 +35,20 @@ namespace Vertical.HubSpot.Api {
         /// <param name="apikey">key used to access api</param>
         /// <param name="endpoint">base endpoint to use for rest calls</param>
         public HubSpot(string apikey, Uri endpoint) 
-        : this(new HubSpotRestClient(apikey, endpoint))
+        : this(new HubSpotOptions {ApiKey = apikey, ApiUrl = endpoint})
         {
         }
 
         /// <summary>
         /// creates a new <see cref="HubSpot"/>
         /// </summary>
-        /// <param name="restclient">rest client used to access hubspot</param>
         /// <param name="options">options for hubspot api</param>
-        public HubSpot(HubSpotRestClient restclient, HubSpotOptions options = null)
+        public HubSpot(HubSpotOptions options)
         {
             options = options ?? new HubSpotOptions();
+            options.HttpClient = options.HttpClient ?? new SystemHttpClient();
+
+            HubSpotRestClient restclient = new HubSpotRestClient(options.ApiKey, options.ApiUrl, options.HttpClient);
             ModelRegistry registry = new ModelRegistry();
             Contacts = new ContactApi(options, restclient, registry);
             Companies = new CompanyApi(restclient, registry);
@@ -73,6 +67,7 @@ namespace Vertical.HubSpot.Api {
         /// <param name="associations">associations api to use</param>
         /// <param name="deals">deals api to use</param>
         /// <param name="tickets">tickets api to use</param>
+        /// <param name="blogposts">blogpost api to use</param>
         public HubSpot(IContactApi contacts, ICompanyApi companies, IAssociationApi associations, IDealsApi deals, ITicketsApi tickets, IBlogPostApi blogposts, IEngagementsApi engagements ) {
             Contacts = contacts;
             Companies = companies;

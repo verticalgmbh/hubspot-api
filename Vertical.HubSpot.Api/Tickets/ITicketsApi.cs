@@ -1,4 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Vertical.HubSpot.Api.Companies;
+using Vertical.HubSpot.Api.Data;
+using Vertical.HubSpot.Api.Query;
 
 namespace Vertical.HubSpot.Api.Tickets {
 
@@ -22,5 +25,13 @@ namespace Vertical.HubSpot.Api.Tickets {
         /// <param name="ticketid">id of ticket to get</param>
         /// <returns>fetched ticket data</returns>
         Task<T> GetTicket<T>(long ticketid) where T : HubspotTicket;
+
+        /// <summary>
+        /// queries for company data
+        /// </summary>
+        /// <param name="query">query to execute</param>
+        /// <returns>a page of query results</returns>
+        Task<QueryPage<T>> Query<T>(ObjectQuery query)
+            where T : HubspotTicket;
     }
 }

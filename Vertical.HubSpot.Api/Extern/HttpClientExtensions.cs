@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Extensions
+namespace Vertical.HubSpot.Api.Extern
 {
     public static class HttpClientExtensions
     {

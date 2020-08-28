@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Vertical.HubSpot.Api.Data;
+using Vertical.HubSpot.Api.Query;
 
 namespace Vertical.HubSpot.Api.Contacts {
 
@@ -67,6 +68,14 @@ namespace Vertical.HubSpot.Api.Contacts {
         /// <param name="email">email of contact to return</param>
         /// <returns>contact data</returns>
         Task<T> Get<T>(string email)
+            where T : HubSpotContact;
+
+        /// <summary>
+        /// queries for company data
+        /// </summary>
+        /// <param name="query">query to execute</param>
+        /// <returns>a page of query results</returns>
+        Task<QueryPage<T>> Query<T>(ObjectQuery query)
             where T : HubSpotContact;
     }
 }

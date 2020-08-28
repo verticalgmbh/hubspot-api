@@ -9,6 +9,8 @@ using NightlyCode.Core.Conversion;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
+using Vertical.HubSpot.Api.Query;
+using Vertical.HubSpot.Api.Tickets;
 
 namespace Vertical.HubSpot.Api.Deals {
     /// <summary>
@@ -248,6 +250,17 @@ namespace Vertical.HubSpot.Api.Deals {
             where T : HubSpotDeal {
             JObject response = await rest.Get<JObject>($"deals/v1/deal/{id}");
             return ToDeal<T>(response, registry.Get(typeof(T)));
+        }
+
+        /// <inheritdoc />
+        public async Task<QueryPage<T>> Query<T>(ObjectQuery query) where T : HubSpotDeal {
+            QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/deals/search", query);
+
+            EntityModel model = registry.Get(typeof(T));
+            return new QueryPage<T> {
+                Paging = page.Paging,
+                Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
+            };
         }
 
     }

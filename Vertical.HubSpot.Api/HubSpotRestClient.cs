@@ -4,9 +4,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Vertical.HubSpot.Api.Data;
+using Vertical.HubSpot.Api.Http;
 using Vertical.HubSpot.Api.Logging;
 
 namespace Vertical.HubSpot.Api {
@@ -16,19 +17,21 @@ namespace Vertical.HubSpot.Api {
     /// </summary>
     public class HubSpotRestClient {
         readonly string apikey;
-        readonly HttpClient client = new HttpClient();
+        readonly IHttpClient client;
 
         /// <summary>
         /// creates a new <see cref="HubSpotRestClient"/>
         /// </summary>
         /// <param name="apikey">key used to access hubspot</param>
         /// <param name="baseaddress">baseaddress of hubspot api</param>
-        public HubSpotRestClient(string apikey, Uri baseaddress) {
+        /// <param name="httpclient">http client to use (optional)</param>
+        public HubSpotRestClient(string apikey, Uri baseaddress, IHttpClient httpclient=null) {
             this.apikey = apikey;
+            client = httpclient ?? new SystemHttpClient();
             client.BaseAddress = baseaddress;
         }
 
-        async Task CheckForError(JToken request, HttpResponseMessage response) {
+        async Task CheckForError(object request, HttpResponseMessage response) {
             if(!response.IsSuccessStatusCode) {
                 if (response.Content.Headers.ContentLength == 0) {
                     Logger.Error(this, $"{response.StatusCode}: {response.ReasonPhrase}");
@@ -41,21 +44,23 @@ namespace Vertical.HubSpot.Api {
             }
         }
 
-        async Task<T> ReadResponse<T>(HttpResponseMessage message)
-        where T : JToken
-        {
+        async Task<T> ReadResponse<T>(HttpResponseMessage message) {
             if (message.Content.Headers.ContentLength > 0)
             {
                 string responsestring = await message.Content.ReadAsStringAsync();
                 Logger.Info(this, "Response", responsestring);
-                JToken response=JToken.Parse(responsestring);
-                if(!(response is T))
-                    throw new InvalidOperationException($"Response is not {nameof(T)}");
-                return (T) response;
+                if (typeof(JToken).IsAssignableFrom(typeof(T))) {
+                    JToken response = JToken.Parse(responsestring);
+                    if (!(response is T))
+                        throw new InvalidOperationException($"Response is not {nameof(T)}");
+                    return (T) (object) response;
+                }
+
+                return JsonConvert.DeserializeObject<T>(responsestring);
             }
 
             Logger.Info(this, "No response body");
-            return null;
+            return default;
         }
 
         /// <summary>
@@ -65,13 +70,13 @@ namespace Vertical.HubSpot.Api {
         /// <param name="request">request data</param>
         /// <param name="parameters">additional query parameters</param>
         /// <returns>response data</returns>
-        public async Task<T> Post<T>(string url, JToken request, params Parameter[] parameters)
-            where T : JToken {
-            url += $"?hapikey={apikey}";
-            if (parameters.Length > 0)
-                url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
+        public async Task<T> Post<T>(string url, object request, params Parameter[] parameters) {
+            QueryParameters queryparams = new QueryParameters(parameters);
+            queryparams.Add(new Parameter("hapikey", apikey));
 
-            HttpResponseMessage response = await client.PostAsync(url, new StringContent(request.ToString(), Encoding.UTF8, "application/json"));
+
+            string json = request is JToken ? request.ToString() : JsonConvert.SerializeObject(request);
+            HttpResponseMessage response = await client.PostAsync($"{url}{queryparams}", new StringContent(json, Encoding.UTF8, "application/json"));
             using (response) {
                 await CheckForError(request, response);
                 return await ReadResponse<T>(response);

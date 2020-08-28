@@ -7,10 +7,7 @@ namespace Vertical.HubSpot.Api.Models {
     /// <summary>
     /// model for an entity
     /// </summary>
-#if DEBUG
-    public
-#endif
-    class EntityModel {
+    public class EntityModel {
         readonly Dictionary<string, PropertyInfo> propertymapping=new Dictionary<string, PropertyInfo>();
         readonly Dictionary<string, string> namemapping = new Dictionary<string, string>();
 
@@ -18,6 +15,16 @@ namespace Vertical.HubSpot.Api.Models {
         /// all properties in entity model
         /// </summary>
         public IEnumerable<KeyValuePair<string, PropertyInfo>> Properties => propertymapping;
+
+        /// <summary>
+        /// property for id
+        /// </summary>
+        public PropertyInfo IdProperty { get; set; }
+
+        /// <summary>
+        /// property for deleted info
+        /// </summary>
+        public PropertyInfo DeletedProperty { get; set; }
 
         /// <summary>
         /// adds a property to the model

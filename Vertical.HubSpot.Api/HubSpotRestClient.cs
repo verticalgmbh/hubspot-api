@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Http;
 using Vertical.HubSpot.Api.Logging;
@@ -18,6 +19,11 @@ namespace Vertical.HubSpot.Api {
     public class HubSpotRestClient {
         readonly string apikey;
         readonly IHttpClient client;
+
+        JsonSerializerSettings jsonsettings = new JsonSerializerSettings {
+            NullValueHandling = NullValueHandling.Ignore,
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
 
         /// <summary>
         /// creates a new <see cref="HubSpotRestClient"/>
@@ -75,7 +81,7 @@ namespace Vertical.HubSpot.Api {
             queryparams.Add(new Parameter("hapikey", apikey));
 
 
-            string json = request is JToken ? request.ToString() : JsonConvert.SerializeObject(request);
+            string json = request is JToken ? request.ToString() : JsonConvert.SerializeObject(request, jsonsettings);
             HttpResponseMessage response = await client.PostAsync($"{url}{queryparams}", new StringContent(json, Encoding.UTF8, "application/json"));
             using (response) {
                 await CheckForError(request, response);

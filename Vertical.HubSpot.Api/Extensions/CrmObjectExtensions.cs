@@ -28,7 +28,16 @@ namespace Vertical.HubSpot.Api.Extensions {
                 PropertyInfo propinfo = model.GetProperty(property.Key);
                 if (propinfo == null)
                     continue;
-                propinfo.SetValue(result, Converter.Convert(property.Value, propinfo.PropertyType));
+
+                if (property.Value == null || property.Value as string == "")
+                    continue;
+
+                try {
+                    propinfo.SetValue(result, Converter.Convert(property.Value, propinfo.PropertyType));
+                }
+                catch {
+                }
+                
             }
 
             return result;

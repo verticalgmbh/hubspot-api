@@ -8,7 +8,7 @@
         /// <summary>
         /// property is equal to a value
         /// </summary>
-        public const string Equals = "EQ";
+        public new const string Equals = "EQ";
 
         /// <summary>
         /// property is not equal to a value

@@ -22,6 +22,7 @@ namespace Vertical.HubSpot.Api.Contacts
         /// determines whether contact is deleted
         /// </summary>
         [IgnoreDataMember]
+        [HubspotDeleted]
         public bool Deleted { get; set; }
     }
 }

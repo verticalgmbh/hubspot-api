@@ -19,6 +19,7 @@ namespace Vertical.HubSpot.Api.Companies {
         /// determines whether the entity is deleted
         /// </summary>
         [IgnoreDataMember]
+        [HubspotDeleted]
         public bool IsDeleted { get; set; }
     }
 }

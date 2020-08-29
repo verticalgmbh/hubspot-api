@@ -43,8 +43,12 @@ namespace Vertical.HubSpot.Api.Deals {
 
             JObject responseproperties = (JObject)deal["properties"];
             foreach(KeyValuePair<string, PropertyInfo> property in model.Properties) {
-                if(responseproperties.ContainsKey(property.Key))
-                    property.Value.SetValue(result, Converter.Convert(responseproperties[property.Key].Value<object>("value"), property.Value.PropertyType));
+                if (responseproperties.ContainsKey(property.Key)) {
+                    object value = responseproperties[property.Key].Value<object>("value");
+                    if (value == null || value as string == "")
+                        continue;
+                    property.Value.SetValue(result, Converter.Convert(value, property.Value.PropertyType));
+                }
             }
 
             return result;

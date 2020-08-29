@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
@@ -20,10 +21,13 @@ namespace Vertical.HubSpot.Api {
         readonly string apikey;
         readonly IHttpClient client;
 
-        JsonSerializerSettings jsonsettings = new JsonSerializerSettings {
+        readonly JsonSerializerSettings jsonsettings = new JsonSerializerSettings {
             NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
+
+        DateTime lastquotacall = DateTime.Now - TimeSpan.FromSeconds(1);
+        SemaphoreSlim wait = new SemaphoreSlim(1, 1);
 
         /// <summary>
         /// creates a new <see cref="HubSpotRestClient"/>
@@ -161,6 +165,24 @@ namespace Vertical.HubSpot.Api {
                 await CheckForError(null, response);
                 return await ReadResponse<T>(response);
             }
+        }
+
+        /// <summary>
+        /// starts a new quota call
+        /// </summary>
+        public async Task StartQuotaCall() {
+            await wait.WaitAsync();
+            TimeSpan delta = lastquotacall + TimeSpan.FromSeconds(0.3) - DateTime.Now;
+            if (delta.Ticks > 0)
+                await Task.Delay(delta);
+        }
+
+        /// <summary>
+        /// releases lock on quota call
+        /// </summary>
+        public void EndQuotaCall() {
+            lastquotacall=DateTime.Now;
+            wait.Release();
         }
     }
 }

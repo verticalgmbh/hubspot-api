@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -172,13 +173,19 @@ namespace Vertical.HubSpot.Api.Contacts {
 
         /// <inheritdoc />
         public async Task<QueryPage<T>> Query<T>(ObjectQuery query) where T : HubSpotContact {
-            QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/contacts/search", query);
+            try {
+                await rest.StartQuotaCall();
+                QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/contacts/search", query);
 
-            EntityModel model = models.Get(typeof(T));
-            return new QueryPage<T> {
-                Paging = page.Paging,
-                Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
-            };
+                EntityModel model = models.Get(typeof(T));
+                return new QueryPage<T> {
+                    Paging = page.Paging,
+                    Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
+                };
+            }
+            finally {
+                rest.EndQuotaCall();
+            }
         }
 
     }

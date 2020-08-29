@@ -258,13 +258,19 @@ namespace Vertical.HubSpot.Api.Deals {
 
         /// <inheritdoc />
         public async Task<QueryPage<T>> Query<T>(ObjectQuery query) where T : HubSpotDeal {
-            QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/deals/search", query);
+            try {
+                await rest.StartQuotaCall();
+                QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/deals/search", query);
 
-            EntityModel model = registry.Get(typeof(T));
-            return new QueryPage<T> {
-                Paging = page.Paging,
-                Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
-            };
+                EntityModel model = registry.Get(typeof(T));
+                return new QueryPage<T> {
+                    Paging = page.Paging,
+                    Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
+                };
+            }
+            finally {
+                rest.EndQuotaCall();
+            }
         }
 
     }

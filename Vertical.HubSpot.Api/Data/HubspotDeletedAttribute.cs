@@ -1,9 +1,11 @@
-﻿namespace Vertical.HubSpot.Api.Data {
+﻿using System;
+
+namespace Vertical.HubSpot.Api.Data {
 
     /// <summary>
     /// attribute indicating property for deleted information
     /// </summary>
-    public class HubspotDeletedAttribute : HubspotIdAttribute {
+    public class HubspotDeletedAttribute : Attribute {
         
     }
 }

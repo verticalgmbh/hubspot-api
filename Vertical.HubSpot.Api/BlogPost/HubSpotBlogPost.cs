@@ -11,6 +11,7 @@ namespace Vertical.HubSpot.Api.BlogPost
         /// If True, the post will not show up in your dashboard, although the post will still be live
         /// </summary>
         [JsonProperty("id")]
+        [HubspotId]
         public long Id { get; set; }
 
         /// <summary>

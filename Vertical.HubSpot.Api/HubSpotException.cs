@@ -13,7 +13,7 @@ namespace Vertical.HubSpot.Api {
         /// </summary>
         /// <param name="message">message describing error</param>
         /// <param name="request">original request sent to hubspot</param>
-        public HubSpotException(string message, JToken request) 
+        public HubSpotException(string message, object request) 
             : this(message, null, request) {
         }
 
@@ -23,7 +23,7 @@ namespace Vertical.HubSpot.Api {
         /// <param name="message">message describing error</param>
         /// <param name="innerException">exception which is the source for this exception</param>
         /// <param name="request">original request sent to hubspot</param>
-        public HubSpotException(string message, Exception innerException, JToken request) 
+        public HubSpotException(string message, Exception innerException, object request) 
             : base(message, innerException) {
             Request = request;
         }
@@ -31,6 +31,6 @@ namespace Vertical.HubSpot.Api {
         /// <summary>
         /// original request to hubspot
         /// </summary>
-        public JToken Request { get; }
+        public object Request { get; }
     }
 }

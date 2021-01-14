@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NightlyCode.Core.Conversion;
 using Vertical.HubSpot.Api.Data;
+using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
+using Vertical.HubSpot.Api.Query;
 
 namespace Vertical.HubSpot.Api.Companies {
     /// <summary>
@@ -257,6 +259,28 @@ namespace Vertical.HubSpot.Api.Companies {
             where T : HubSpotCompany {
             JObject response = await rest.Get<JObject>($"companies/v2/companies/{id}");
             return ToCompany<T>(response, registry.Get(typeof(T)));
+        }
+
+        /// <summary>
+        /// queries for objects on hubspot
+        /// </summary>
+        /// <typeparam name="T">type of object to query for</typeparam>
+        /// <param name="query">query to execute</param>
+        /// <returns>page of query results</returns>
+        public async Task<QueryPage<T>> Query<T>(ObjectQuery query) where T : HubSpotCompany {
+            await rest.StartQuotaCall();
+            try {
+                QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/companies/search", query);
+
+                EntityModel model = registry.Get(typeof(T));
+                return new QueryPage<T> {
+                    Paging = page.Paging,
+                    Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
+                };
+            }
+            finally {
+                rest.EndQuotaCall();
+            }
         }
     }
 }

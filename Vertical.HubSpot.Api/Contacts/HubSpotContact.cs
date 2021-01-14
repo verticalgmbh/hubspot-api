@@ -15,12 +15,14 @@ namespace Vertical.HubSpot.Api.Contacts
         /// </summary>
         [IgnoreDataMember]
         [Name("vid")]
+        [HubspotId]
         public long ID { get; set; }
 
         /// <summary>
         /// determines whether contact is deleted
         /// </summary>
         [IgnoreDataMember]
+        [HubspotDeleted]
         public bool Deleted { get; set; }
     }
 }

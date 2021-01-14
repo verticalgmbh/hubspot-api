@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Vertical.HubSpot.Api.Data;
 
 namespace Vertical.HubSpot.Api.Engagements
 {
     public class HubspotEngagement
     {
         [JsonProperty("id")]
+        [HubspotId]
         public long Id { get; set; }
 
         [JsonProperty("portalId")]

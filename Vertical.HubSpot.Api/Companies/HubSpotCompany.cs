@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Vertical.HubSpot.Api.Data;
 
 namespace Vertical.HubSpot.Api.Companies {
 
@@ -11,12 +12,14 @@ namespace Vertical.HubSpot.Api.Companies {
         /// id of company
         /// </summary>
         [IgnoreDataMember]
+        [HubspotId]
         public long ID { get; set; }
 
         /// <summary>
         /// determines whether the entity is deleted
         /// </summary>
         [IgnoreDataMember]
+        [HubspotDeleted]
         public bool IsDeleted { get; set; }
     }
 }

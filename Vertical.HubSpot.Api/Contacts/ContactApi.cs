@@ -7,23 +7,26 @@ using Newtonsoft.Json.Linq;
 using Vertical.HubSpot.Api.Data;
 using Vertical.HubSpot.Api.Extensions;
 using Vertical.HubSpot.Api.Models;
+using Vertical.HubSpot.Api.Query;
 
 namespace Vertical.HubSpot.Api.Contacts {
+
     /// <summary>
     /// access to contacts api
     /// </summary>
     public class ContactApi : IContactApi {
-        private readonly HubSpotOptions _options;
+        readonly HubSpotOptions options;
         readonly HubSpotRestClient rest;
         readonly ModelRegistry models;
 
         /// <summary>
         /// creates a new <see cref="ContactApi"/>
         /// </summary>
+        /// <param name="options"></param>
         /// <param name="rest">rest client to call api</param>
         /// <param name="models">model registry used to access entity models</param>
         internal ContactApi(HubSpotOptions options, HubSpotRestClient rest, ModelRegistry models) {
-            _options = options;
+            this.options = options;
             this.rest = rest;
             this.models = models;
         }
@@ -37,13 +40,13 @@ namespace Vertical.HubSpot.Api.Contacts {
                 yield return new Parameter("property", property);
         }
 
-        private JArray GetProperties<T>(T contact, EntityModel model)
+        JArray GetProperties<T>(T contact, EntityModel model)
         {
             JArray properties = new JArray();
             foreach (KeyValuePair<string, PropertyInfo> property in model.Properties)
             {
                 object propertyValue = property.Value.GetValue(contact);
-                if ((_options.Contact?.IgnorePropertiesWithNullValues ?? HubSpotContactOptions.IgnorePropertiesWithNullValuesDefault) && propertyValue == null)
+                if ((options.Contact?.IgnorePropertiesWithNullValues ?? HubSpotContactOptions.IgnorePropertiesWithNullValuesDefault) && propertyValue == null)
                     continue;
                 properties.Add(new JObject
                 {
@@ -211,5 +214,23 @@ namespace Vertical.HubSpot.Api.Contacts {
             EntityModel model = models.Get(typeof(T));
             return response.ToContact<T>(model);
         }
+
+        /// <inheritdoc />
+        public async Task<QueryPage<T>> Query<T>(ObjectQuery query) where T : HubSpotContact {
+            try {
+                await rest.StartQuotaCall();
+                QueryPage<CrmObject> page = await rest.Post<QueryPage<CrmObject>>("crm/v3/objects/contacts/search", query);
+
+                EntityModel model = models.Get(typeof(T));
+                return new QueryPage<T> {
+                    Paging = page.Paging,
+                    Results = page.Results.Select(o => o.Convert<T>(model)).ToArray()
+                };
+            }
+            finally {
+                rest.EndQuotaCall();
+            }
+        }
+
     }
 }

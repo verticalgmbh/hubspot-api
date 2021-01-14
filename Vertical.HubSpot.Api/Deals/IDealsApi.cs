@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Data;
+using Vertical.HubSpot.Api.Query;
 
 namespace Vertical.HubSpot.Api.Deals {
 
@@ -90,6 +92,14 @@ namespace Vertical.HubSpot.Api.Deals {
         /// <param name="id">id of deal to return</param>
         /// <returns>deal data</returns>
         Task<T> Get<T>(long id)
+            where T : HubSpotDeal;
+
+        /// <summary>
+        /// queries for company data
+        /// </summary>
+        /// <param name="query">query to execute</param>
+        /// <returns>a page of query results</returns>
+        Task<QueryPage<T>> Query<T>(ObjectQuery query)
             where T : HubSpotDeal;
     }
 }

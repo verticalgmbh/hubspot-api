@@ -29,7 +29,7 @@ namespace Vertical.HubSpot.Test.Engagements
             });
         }
 
-        private async Task<HubSpotEngagementResult> FindEngagement(Api.HubSpot hubspot, long id)
+        async Task<HubSpotEngagementResult> FindEngagement(Api.HubSpot hubspot, long id)
         {
             var engagement = await hubspot.Engagements.GetEngagement<HubSpotEngagementResult>(id);
             Assert.True(engagement != null, $"Engagement with id {id} not found");

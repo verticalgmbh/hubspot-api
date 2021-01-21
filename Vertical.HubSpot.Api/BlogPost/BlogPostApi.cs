@@ -39,7 +39,7 @@ namespace Vertical.HubSpot.Api.BlogPost
                 }
         }
 
-        public async Task<HubSpotBlogPostList<T>> ListPage<T>(int? offset = null, int? limit = null, string state = "PUBLISHED", params KeyValuePair<string, string>[] properties)  where T : HubSpotBlogPost
+        public async Task<HubSpotBlogPostList<T>> ListPage<T>(long? offset = null, int? limit = null, string state = "PUBLISHED", params KeyValuePair<string, string>[] properties)  where T : HubSpotBlogPost
         {
             JObject response = await _rest.Get<JObject>("content/api/v2/blog-posts", GetListParameters(offset, limit, state, "-publish_date", properties).ToArray());
 

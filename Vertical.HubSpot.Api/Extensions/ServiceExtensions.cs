@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Vertical.HubSpot.Api.Associations;
+using Vertical.HubSpot.Api.BlogPost;
 using Vertical.HubSpot.Api.Companies;
 using Vertical.HubSpot.Api.Contacts;
 using Vertical.HubSpot.Api.Deals;
@@ -47,6 +48,11 @@ namespace Vertical.HubSpot.Api.Extensions
                 {
                     var hubspot = provider.GetRequiredService<IHubSpot>();
                     return hubspot.Deals as DealsApi ?? throw new NotSupportedException(nameof(IDealsApi));
+                })
+                .AddSingleton<IBlogPostApi, BlogPostApi>(provider =>
+                {
+                    var hubspot = provider.GetRequiredService<IHubSpot>();
+                    return hubspot.BlogPosts as BlogPostApi ?? throw new NotSupportedException(nameof(IBlogPostApi));
                 })
                 .AddSingleton<ITicketsApi, TicketsApi>(provider =>
                 {

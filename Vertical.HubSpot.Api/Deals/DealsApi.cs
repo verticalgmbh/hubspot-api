@@ -170,8 +170,10 @@ namespace Vertical.HubSpot.Api.Deals {
 
             JObject response = await rest.Get<JObject>("deals/v1/deal/paged", GetListParameters(offset, properties).ToArray());
 
+            var hasMore = response.Value<bool>("hasMore");
             return new PageResponse<T> {
-                Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("deals").OfType<JObject>().Select(d => ToDeal<T>(d, model)).ToArray()
             };
         }
@@ -207,8 +209,10 @@ namespace Vertical.HubSpot.Api.Deals {
 
             JObject response = await rest.Get<JObject>("deals/v1/deal/recent/modified", GetRecentParameters(since, offset).ToArray());
 
+            var hasMore = response.Value<bool>("hasMore");
             return new PageResponse<T> {
-                Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToDeal<T>(d, model)).ToArray()
             };
         }

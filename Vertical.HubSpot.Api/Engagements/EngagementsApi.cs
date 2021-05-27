@@ -48,7 +48,7 @@ namespace Vertical.HubSpot.Api.Engagements
         public async Task<T> CreateEngagement<T>(HubSpotEngagementResult data)
             where T : HubSpotEngagementResult
         {
-            var requestData = JToken.FromObject(data);
+            var requestData = JToken.FromObject(data, new Newtonsoft.Json.JsonSerializer() { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore });
             JObject response = await rest.Post<JObject>($"/engagements/v1/engagements", requestData);
             return ToEngagementResult<T>(response);
         }

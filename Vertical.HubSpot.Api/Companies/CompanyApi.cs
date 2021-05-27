@@ -144,8 +144,10 @@ namespace Vertical.HubSpot.Api.Companies {
 
             JObject response = await rest.Get<JObject>("companies/v2/companies/paged", GetListParameters(offset, properties).ToArray());
 
+            var hasMore = response.Value<bool>("has-more");
             return new PageResponse<T> {
-                Offset = response.Value<bool>("has-more") ? response.Value<long?>("offset") : null,
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("companies").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
             };
         }
@@ -162,8 +164,10 @@ namespace Vertical.HubSpot.Api.Companies {
 
             JObject response = await rest.Get<JObject>("companies/v2/companies/recent/modified", GetListParameters(offset).ToArray());
 
+            var hasMore = response.Value<bool>("has-more");
             return new PageResponse<T> {
-                Offset = response.Value<bool>("hasMore") ? response.Value<long?>("offset") : null,
+                HasMore = hasMore,
+                Offset = hasMore ? response.Value<long?>("offset") : null,
                 Data = response.GetValue("results").OfType<JObject>().Select(d => ToCompany<T>(d, model)).ToArray()
             };
         }

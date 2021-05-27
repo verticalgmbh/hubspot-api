@@ -161,7 +161,7 @@ namespace Vertical.HubSpot.Api.Contacts {
             {
                 HasMore = hasMore,
                 Offset = hasMore ? response.Value<long?>("vid-offset") : null,
-                Data = response.GetValue("results").OfType<JObject>().Select(d => d.ToContact<T>(model)).ToArray()
+                Data = response.GetValue("contacts").OfType<JObject>().Select(d => d.ToContact<T>(model)).ToArray()
             };
         }
 

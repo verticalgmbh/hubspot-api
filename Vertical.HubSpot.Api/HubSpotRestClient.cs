@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -26,6 +27,7 @@ namespace Vertical.HubSpot.Api {
         public HubSpotRestClient(string apikey, Uri baseaddress) {
             this.apikey = apikey;
             client.BaseAddress = baseaddress;
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {this.apikey}");
         }
 
         async Task CheckForError(JToken request, HttpResponseMessage response) {
@@ -67,7 +69,7 @@ namespace Vertical.HubSpot.Api {
         /// <returns>response data</returns>
         public async Task<T> Post<T>(string url, JToken request, params Parameter[] parameters)
             where T : JToken {
-            url += $"?hapikey={apikey}";
+            url += $"?";
             if (parameters.Length > 0)
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
 
@@ -87,7 +89,7 @@ namespace Vertical.HubSpot.Api {
         /// <returns>response data</returns>
         public async Task<T> Patch<T>(string url, JToken request, params Parameter[] parameters)
             where T : JToken {
-            url += $"?hapikey={apikey}";
+            url += $"?";
             if (parameters.Length > 0)
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
 
@@ -107,7 +109,7 @@ namespace Vertical.HubSpot.Api {
         /// <returns>response data</returns>
         public async Task<T> Put<T>(string url, JToken request, params Parameter[] parameters)
             where T : JToken {
-            url += $"?hapikey={apikey}";
+            url += $"?";
             if (parameters.Length > 0)
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
 
@@ -125,7 +127,6 @@ namespace Vertical.HubSpot.Api {
         /// <returns>response data</returns>
         public async Task<T> Delete<T>(string url)
             where T : JToken {
-            url += $"?hapikey={apikey}";
             HttpResponseMessage response = await client.DeleteAsync(url);
             using (response) {
                 await CheckForError(null, response);
@@ -141,7 +142,7 @@ namespace Vertical.HubSpot.Api {
         /// <returns>response data</returns>
         public async Task<T> Get<T>(string url, params Parameter[] parameters)
             where T : JToken {
-            url += $"?hapikey={apikey}";
+            url += $"?";
             if (parameters.Length > 0)
                 url += $"&{string.Join("&", parameters.Select(p => p.Key + "=" + HttpUtility.UrlEncode(p.Value)))}";
 
